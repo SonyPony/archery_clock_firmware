@@ -9,6 +9,7 @@
 #include <port_linked_pin.h>
 #include <gpioex.h>
 #include <buffer.h>
+#include <shift_register.h>
 
 // message buffer
 #define MESSAGE_BUFFER_SIZE 128
@@ -22,13 +23,15 @@ const PortLinkedPin sr_data_pin = {.port = GPIOD, .pin = GPIO_PIN_3};
 const PortLinkedPin sr_cs_pin = {.port = GPIOD, .pin = GPIO_PIN_2};
 const PortLinkedPin beeper_pin = {.port = GPIOB, .pin = GPIO_PIN_5};
 
+ShiftRegister shift_register;
+
 void initialized_mcu()
 {
   GPIOex_Init(&led_pin, GPIO_MODE_OUT_PP_LOW_FAST);
-  GPIOex_Init(&sr_clk_pin, GPIO_MODE_OUT_PP_LOW_SLOW);  // TODO move to sr init
-  GPIOex_Init(&sr_data_pin, GPIO_MODE_OUT_PP_LOW_SLOW);
-  GPIOex_Init(&sr_cs_pin, GPIO_MODE_OUT_PP_HIGH_SLOW);
   GPIOex_Init(&beeper_pin, GPIO_MODE_OUT_PP_LOW_SLOW);
+
+  // init shift register controller
+  sr_init(&shift_register, &sr_clk_pin, &sr_data_pin, &sr_cs_pin);
 
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1); // 16MHz from internal RC oscillator
   init_milis();
