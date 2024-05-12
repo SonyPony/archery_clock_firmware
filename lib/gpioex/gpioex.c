@@ -23,6 +23,7 @@ void GPIOex_WriteLow(PortLinkedPin *pin)
     GPIO_WriteLow(pin->port, (GPIO_Pin_TypeDef)pin->pin);
 }
 
-void GPIOex_WriteReverse(PortLinkedPin *pin) {
+void GPIOex_WriteReverse(PortLinkedPin *pin)
+{
     GPIO_WriteReverse(pin->port, (GPIO_Pin_TypeDef)pin->pin);
 }

@@ -8,22 +8,24 @@
 #include <port_linked_pin.h>
 #include <gpioex.h>
 
-
 const PortLinkedPin led_pin = {.port = GPIOC, .pin = GPIO_PIN_5};
 
-int main(void)
+void initialized_mcu()
 {
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1); // 16MHz from internal RC oscillator
   init_milis();
   enableInterrupts();
+}
+
+int main(void)
+{
+  initialized_mcu();
 
   uint8_t i_var = 1;
   uint16_t last_time = 0;
   uint8_t io = 255;
   io++;
 
-  // GPIO_Init(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS, GPIO_MODE_OUT_PP_LOW_FAST);
-  //GPIO_Init(led_pin.port, (GPIO_Pin_TypeDef)led_pin.pin, GPIO_MODE_OUT_PP_LOW_FAST);
   GPIOex_Init(&led_pin, GPIO_MODE_OUT_PP_LOW_FAST);
 
   while (1)
@@ -34,10 +36,10 @@ int main(void)
     {
       last_time = milis();
       GPIOex_WriteReverse(&led_pin);
-      // GPIO_WriteReverse(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS);
     }
-    // Delay(0xFFFF);
   }
+
+  return 0;
 }
 
 #ifdef USE_FULL_ASSERT
