@@ -4,19 +4,49 @@
 #include <stm8s_tim4.h>
 #include <stm8s_itc.h>
 #include <stm8s_clk.h>
+#include <stm8s_uart3.h>
 #include <milis.h>
 #include <port_linked_pin.h>
 #include <gpioex.h>
+#include <buffer.h>
 
+// message buffer
+#define MESSAGE_BUFFER_SIZE 128
+volatile uint8_t message_buffer_data[128];
+Buffer message_buffer = {.data = message_buffer_data, .size = MESSAGE_BUFFER_SIZE};
+
+// ports definition
 const PortLinkedPin led_pin = {.port = GPIOC, .pin = GPIO_PIN_5};
+const PortLinkedPin sr_clk_pin = {.port = GPIOD, .pin = GPIO_PIN_0};
+const PortLinkedPin sr_data_pin = {.port = GPIOD, .pin = GPIO_PIN_3};
+const PortLinkedPin sr_cs_pin = {.port = GPIOD, .pin = GPIO_PIN_2};
+const PortLinkedPin beeper_pin = {.port = GPIOB, .pin = GPIO_PIN_5};
 
 void initialized_mcu()
 {
+  GPIOex_Init(&led_pin, GPIO_MODE_OUT_PP_LOW_FAST);
+  GPIOex_Init(&sr_clk_pin, GPIO_MODE_OUT_PP_LOW_SLOW);  // TODO move to sr init
+  GPIOex_Init(&sr_data_pin, GPIO_MODE_OUT_PP_LOW_SLOW);
+  GPIOex_Init(&sr_cs_pin, GPIO_MODE_OUT_PP_HIGH_SLOW);
+  GPIOex_Init(&beeper_pin, GPIO_MODE_OUT_PP_LOW_SLOW);
+
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1); // 16MHz from internal RC oscillator
   init_milis();
+
+  UART3_Init(115200, UART3_WORDLENGTH_8D, UART3_STOPBITS_1, UART3_PARITY_NO, UART3_MODE_TXRX_ENABLE);
+  UART3_ITConfig(UART3_IT_RXNE_OR, ENABLE);
+  UART3_Cmd(ENABLE);
+
   enableInterrupts();
+
+  // TODO clear shift registers
+
+  // clear message buffer
+  buffer_clear(&message_buffer);
 }
 
+
+// main function with loop
 int main(void)
 {
   initialized_mcu();
@@ -25,8 +55,6 @@ int main(void)
   uint16_t last_time = 0;
   uint8_t io = 255;
   io++;
-
-  GPIOex_Init(&led_pin, GPIO_MODE_OUT_PP_LOW_FAST);
 
   while (1)
   {
