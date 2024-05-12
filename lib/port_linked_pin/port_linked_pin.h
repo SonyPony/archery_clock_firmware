@@ -5,8 +5,8 @@
 
 typedef struct
 {
-    GPIO_TypeDef* port;
+    GPIO_TypeDef *port;
     GPIO_Pin_TypeDef pin;
-} PortLinkedPin;    // pin linked with port
+} PortLinkedPin; // pin linked with port
 
 #endif

@@ -5,11 +5,11 @@
 #include <stm8s_itc.h>
 #include <stm8s_clk.h>
 #include <milis.h>
+#include <port_linked_pin.h>
+#include <gpioex.h>
 
-#define LED_GPIO_PORT (GPIOC)
-#define LED_GPIO_PINS GPIO_PIN_5
 
-void Delay(uint16_t nCount);
+const PortLinkedPin led_pin = {.port = GPIOC, .pin = GPIO_PIN_5};
 
 int main(void)
 {
@@ -22,7 +22,9 @@ int main(void)
   uint8_t io = 255;
   io++;
 
-  GPIO_Init(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS, GPIO_MODE_OUT_PP_LOW_FAST);
+  // GPIO_Init(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS, GPIO_MODE_OUT_PP_LOW_FAST);
+  //GPIO_Init(led_pin.port, (GPIO_Pin_TypeDef)led_pin.pin, GPIO_MODE_OUT_PP_LOW_FAST);
+  GPIOex_Init(&led_pin, GPIO_MODE_OUT_PP_LOW_FAST);
 
   while (1)
   {
@@ -31,18 +33,10 @@ int main(void)
     if (milis() - last_time > 1000)
     {
       last_time = milis();
-      GPIO_WriteReverse(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS);
+      GPIOex_WriteReverse(&led_pin);
+      // GPIO_WriteReverse(LED_GPIO_PORT, (GPIO_Pin_TypeDef)LED_GPIO_PINS);
     }
     // Delay(0xFFFF);
-  }
-}
-
-void Delay(uint16_t nCount)
-{
-  /* Decrement nCount value */
-  while (nCount != 0)
-  {
-    nCount--;
   }
 }
 
