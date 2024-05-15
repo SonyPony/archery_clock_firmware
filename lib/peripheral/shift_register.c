@@ -22,13 +22,10 @@ void sr_set_data(ShiftRegister *sr, uint8_t data)
     if (sr == NULL)
         return;
 
-    uint8_t bit_mask;
-    uint8_t i = 0;
-
-    for (bit_mask = 0b10000000; bit_mask; bit_mask >>= 1)
+    for (uint8_t bit_mask = 0b10000000; bit_mask; bit_mask >>= 1)
     {
         GPIOex_Write(sr->data_pin, bit_mask & data); // sent bit to the SR
-        for (i = 0; i < 2; i++)                         // send clock pulse
+        for (uint8_t i = 0; i < 2; i++)                         // send clock pulse
         {
             GPIOex_WriteReverse(sr->clk_pin); // the SR will react on rising edge of clock
             _delay_us(1);

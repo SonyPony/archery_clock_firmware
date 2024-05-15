@@ -10,6 +10,7 @@
 #include <gpioex.h>
 #include <buffer.h>
 #include <shift_register.h>
+#include <display.h>
 
 // message buffer
 #define MESSAGE_BUFFER_SIZE 128
@@ -23,15 +24,16 @@ const PortLinkedPin sr_data_pin = {.port = GPIOD, .pin = GPIO_PIN_3};
 const PortLinkedPin sr_cs_pin = {.port = GPIOD, .pin = GPIO_PIN_2};
 const PortLinkedPin beeper_pin = {.port = GPIOB, .pin = GPIO_PIN_5};
 
+// TODO move to display
+// display definitions
+DisplayState display_state;
 ShiftRegister shift_register;
+DisplayController display_controller;
 
 void initialized_mcu()
 {
   GPIOex_Init(&led_pin, GPIO_MODE_OUT_PP_LOW_FAST);
   GPIOex_Init(&beeper_pin, GPIO_MODE_OUT_PP_LOW_SLOW);
-
-  // init shift register controller
-  sr_init(&shift_register, &sr_clk_pin, &sr_data_pin, &sr_cs_pin);
 
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1); // 16MHz from internal RC oscillator
   init_milis();
@@ -42,7 +44,13 @@ void initialized_mcu()
 
   enableInterrupts();
 
-  // TODO clear shift registers
+  // init shift register controller
+  sr_init(&shift_register, &sr_clk_pin, &sr_data_pin, &sr_cs_pin);
+
+  // init display
+  display_controller_init(&display_controller, &shift_register);
+  display_state_clear(&display_state);
+  display_controller_display(&display_controller, &display_state);
 
   // clear message buffer
   buffer_clear(&message_buffer);
