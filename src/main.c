@@ -15,6 +15,8 @@
 #include <parser.h>
 #include <string.h> // TODO delete?
 #include <uart.h>
+#include <stdarg.h> // TODO delete?
+#include <stdio.h>  // TODO delete?
 
 // message buffer
 #define MESSAGE_BUFFER_SIZE 512
@@ -38,6 +40,18 @@ const PortLinkedPin beeper_pin = {.port = GPIOB, .pin = GPIO_PIN_5};
 DisplayState display_state;
 ShiftRegister shift_register;
 DisplayController display_controller;
+
+uint8_t buffer[MESSAGE_BUFFER_SIZE];
+void uart_printf(const char* format, ...) {
+  memset(buffer, 0, MESSAGE_BUFFER_SIZE);
+
+  va_list args;
+  va_start(args, format);
+  vsprintf(buffer, format, args);
+  va_end(args);
+
+  uart_send(PC_UART_CHANNEL, buffer);
+}
 
 void initialized_mcu()
 {
