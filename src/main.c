@@ -4,7 +4,6 @@
 #include <stm8s_tim4.h>
 #include <stm8s_itc.h>
 #include <stm8s_clk.h>
-#include <stm8s_uart3.h>
 #include <milis.h>
 #include <port_linked_pin.h>
 #include <gpioex.h>
@@ -15,16 +14,20 @@
 #include <stdlib.h>
 #include <parser.h>
 #include <string.h> // TODO delete?
-#include <stm8s_uart1.h>
+#include <uart.h>
 
 // message buffer
-#define MESSAGE_BUFFER_SIZE 128
+#define MESSAGE_BUFFER_SIZE 512
 volatile uint8_t message_buffer_data[MESSAGE_BUFFER_SIZE];
 volatile int message_buffer_data_end_idx = 0;
 Buffer message_buffer = {.data = message_buffer_data, .size = MESSAGE_BUFFER_SIZE, .data_end_idx = &message_buffer_data_end_idx};
 
+// UART channels
+#define PC_UART_CHANNEL 1
+#define WIFI_UART_CHANNEL 3
+
 // ports definition
-const PortLinkedPin led_pin = {.port = GPIOC, .pin = GPIO_PIN_5};
+PortLinkedPin led_pin = {.port = GPIOC, .pin = GPIO_PIN_5};
 const PortLinkedPin sr_clk_pin = {.port = GPIOD, .pin = GPIO_PIN_0};
 const PortLinkedPin sr_data_pin = {.port = GPIOD, .pin = GPIO_PIN_3};
 const PortLinkedPin sr_cs_pin = {.port = GPIOD, .pin = GPIO_PIN_2};
@@ -44,14 +47,9 @@ void initialized_mcu()
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1); // 16MHz from internal RC oscillator
   init_milis();
 
-  // init uart
-  UART3_Init(115200, UART3_WORDLENGTH_8D, UART3_STOPBITS_1, UART3_PARITY_NO, UART3_MODE_TXRX_ENABLE);
-  UART3_ITConfig(UART3_IT_RXNE_OR, ENABLE);
-  UART3_Cmd(ENABLE);
-
-  UART1_Init(115200, UART1_WORDLENGTH_8D, UART1_STOPBITS_1, UART1_PARITY_NO, UART1_SYNCMODE_CLOCK_DISABLE, UART1_MODE_TXRX_ENABLE);
-  UART1_ITConfig(UART1_IT_RXNE_OR, ENABLE);
-  UART1_Cmd(ENABLE);
+  // communication channels init
+  uart_init(PC_UART_CHANNEL, 115200);
+  uart_init(WIFI_UART_CHANNEL, 115200);
 
   enableInterrupts();
 
@@ -93,24 +91,23 @@ int main(void)
     i_var++;
     if (milis() - last_time > 1000)
     {
-      UART1_SendData8('a');
+
       last_time = milis();
       GPIOex_WriteReverse(&led_pin);
     }
   }
 
-  // while (1)
-  // {
-
-  // i_var++;
-  // if (milis() - last_time > 1000)
-  // {
-  //   last_time = milis();
-  //   GPIOex_WriteReverse(&led_pin);
-  // }
-  // }
-
   return 0;
+}
+
+INTERRUPT_HANDLER(UART1_RX_IRQHandler, 18)
+{
+  uart_read(PC_UART_CHANNEL, &message_buffer);
+}
+
+INTERRUPT_HANDLER(UART3_RX_IRQHandler, 21)
+{
+  // TODO receive data
 }
 
 #ifdef USE_FULL_ASSERT

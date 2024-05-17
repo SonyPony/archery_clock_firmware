@@ -332,12 +332,10 @@ INTERRUPT_HANDLER(UART1_TX_IRQHandler, 17)
  * @param  None
  * @retval None
  */
-INTERRUPT_HANDLER(UART1_RX_IRQHandler, 18)
+/*INTERRUPT_HANDLER(UART1_RX_IRQHandler, 18)
 {
-  /* In order to detect unexpected events during development,
-     it is recommended to set a breakpoint on the following instruction.
-  */
-}
+  
+}*/
 #endif /*STM8S105 || STM8S001 */
 
 /**
@@ -396,12 +394,10 @@ INTERRUPT_HANDLER(UART3_TX_IRQHandler, 20)
  * @param  None
  * @retval None
  */
-INTERRUPT_HANDLER(UART3_RX_IRQHandler, 21)
+/*INTERRUPT_HANDLER(UART3_RX_IRQHandler, 21)
 {
-  /* In order to detect unexpected events during development,
-     it is recommended to set a breakpoint on the following instruction.
-  */
-}
+  
+}*/
 #endif /*STM8S208 or STM8S207 or STM8AF52Ax or STM8AF62Ax */
 
 #if defined(STM8S207) || defined(STM8S007) || defined(STM8S208) || defined(STM8AF52Ax) || defined(STM8AF62Ax)
