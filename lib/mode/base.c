@@ -186,7 +186,7 @@ void base_mode_round_display(BaseModeData *mode_data, unsigned char *target)
     }
 
     // competition round
-    snprintf(target, MIDDLE_DISPLAY_SIZE, "%2d", mode_data->round_info->current_round % 100);
+    sprintf(target, "%2d", mode_data->round_info->current_round % 100);
 }
 
 void base_mode_free(void **mode_data)

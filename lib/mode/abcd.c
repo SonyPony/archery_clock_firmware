@@ -95,7 +95,7 @@ void abcd_mode_next_turn(AbcdModeData *mode_data)
 void abcd_mode_print(AbcdModeData *mode_data)
 {
     uart_printf(
-        "ABCD(time: %d s, turn: %s, running: %s, prep: %s, training: %s, round: %d)\n",
+        "ABCD(time: %d s, turn: %s, running: %s, prep: %s, training: %s, round: %d)\n\r",
         base_mode_current_time(mode_data->base),
         (mode_data->current_turn == AbTurn) ? "AB" : "CD",
         (base_mode_running(mode_data->base)) ? "true" : "false",

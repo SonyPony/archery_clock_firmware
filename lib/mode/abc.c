@@ -36,7 +36,7 @@ void abc_mode_display(DisplayState *display, AbcModeData *mode_data)
 void abc_mode_print(AbcModeData *mode_data)
 {
     uart_printf(
-        "ABC(time: %d s, running: %s, prep: %s, training: %s, round: %d)\n",
+        "ABC(time: %d s, running: %s, prep: %s, training: %s, round: %d)\n\r",
         base_mode_current_time(mode_data->base),
         (base_mode_running(mode_data->base)) ? "true" : "false",
         (base_mode_prep_time(mode_data->base)) ? "true" : "false",
