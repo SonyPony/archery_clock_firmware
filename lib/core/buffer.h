@@ -6,6 +6,7 @@
 typedef struct
 {
     volatile uint8_t *data;
+    volatile int* data_end_idx;
     int size;
 } Buffer;
 

@@ -11,4 +11,5 @@ void buffer_clear(Buffer *buffer)
 
     for (int i = 0; i < buffer->size; i++)
         buffer->data[i] = 0;
+    *buffer->data_end_idx = 0;
 }
