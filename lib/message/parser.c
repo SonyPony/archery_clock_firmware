@@ -78,7 +78,7 @@ void parse_message_info(Buffer *buffer, MessageInfo *message_info)
     message_info->startIdx = -1;
     message_info->endIdx = -1; // start with invalid message
 
-    for (int i = 0; i < buffer->size; i++)
+    for (int i = 0; i < *buffer->data_end_idx; i++)
     {
         if (buffer->data[i] == MESSAGE_START_SYMBOL)
             message_info->startIdx = i;
