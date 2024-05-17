@@ -1,6 +1,7 @@
 #include "display.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <logging.h>
 
 uint8_t symbol_to_display_segments(unsigned char symbol)
 {
@@ -59,7 +60,7 @@ uint8_t semaphor_to_display_data(SemaphorDisplayState semaphor_state)
         return 0b00000100;
     else if (semaphor_state == SemaphorDisplayGreen)
         return 0b00000001;
-    else    // empty/clear
+    else // empty/clear
         return 0b00000000;
 }
 
@@ -96,4 +97,23 @@ void display_controller_display(DisplayController *display, DisplayState *state)
         sr_set_data(display->shift_register, symbol_to_display_segments(state->right_display[i]));
 
     sr_confirm(display->shift_register);
+}
+
+void display_state_print(DisplayState *display_state)
+{
+    if (display_state == NULL)
+        return;
+
+    char semaphor = 'G';
+    if (display_state->semaphor_display == SemaphorDisplayOrange)
+        semaphor = 'O';
+    else if (display_state->semaphor_display == SemaphorDisplayRed)
+        semaphor = 'R';
+
+    uart_printf(
+        "Display(left: \"%s\", middle: \"%s\", right: \"%s\", semaphor: \"%c\"",
+        display_state->left_display,
+        display_state->middle_display,
+        display_state->right_display,
+        semaphor);
 }

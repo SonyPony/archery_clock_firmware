@@ -18,7 +18,7 @@ typedef enum
 
 typedef struct
 {
-    unsigned char left_display[LEFT_DISPLAY_SIZE + 1];
+    unsigned char left_display[LEFT_DISPLAY_SIZE + 1]; // add 1 for null symbol
     unsigned char right_display[RIGHT_DISPLAY_SIZE + 1];
     unsigned char middle_display[MIDDLE_DISPLAY_SIZE + 1];
     SemaphorDisplayState semaphor_display;
@@ -48,5 +48,7 @@ uint8_t symbol_to_display_segments(unsigned char symbol);
 
 // TODO doc
 uint8_t semaphor_to_display_data(SemaphorDisplayState semaphor_state);
+
+void display_state_print(DisplayState *display_state);
 
 #endif
