@@ -1,21 +1,22 @@
 #include "ab.h"
 #include <stdio.h> // TODO delete
 #include <stdlib.h>
+#include <logging.h>
 
-AbModeData *ab_mode_init(InitializationData init_data)
+AbModeData *ab_mode_init(InitializationData *init_data)
 {
     AbModeData *mode_data = (AbModeData *)malloc(sizeof(AbModeData));
     if (mode_data == NULL)
         return NULL;
 
-    base_mode_init(
-        &mode_data->base,
+    mode_data->base = base_mode_init(
         init_data,
-        (void (*)(void *)) & ab_mode_next_step,
-        (void (*)(void *)) & ab_mode_handle_sec_tick,
-        (void (*)(void *)) & ab_mode_print,
-        (void (*)(void *, InitializationData)) & ab_mode_reset_state,
-        (void (*)(DisplayState *, void *)) & ab_mode_display);
+        (NextStepCallback_t *)&ab_mode_next_step,
+        (HandleSecTickCallback_t *)&ab_mode_handle_sec_tick,
+        (PrintCallback_t *)&ab_mode_print,
+        (ResetStateCallback_t *)&ab_mode_reset_state,
+        (DisplayCallback_t *)&ab_mode_display,
+        (FreeCallback_t *)&ab_mode_free);
 
     return mode_data;
 }
@@ -31,13 +32,13 @@ void ab_mode_next_step(AbModeData *mode_data)
 
     if (!base_mode_running(mode_data->base))
     { // not running -> run;
-        base_mode_set_running(&mode_data->base, true);
-        mode_data->current_time = mode_data->base.init_data.time_per_round;
+        base_mode_set_running(mode_data->base, true);
+        mode_data->current_time = mode_data->base->init_data->time_per_round;
         return;
     }
 
     // if it's running do following
-    base_mode_set_running(&mode_data->base, false);
+    base_mode_set_running(mode_data->base, false);
     mode_data->current_time = 0;
 }
 
@@ -49,29 +50,30 @@ void ab_mode_handle_sec_tick(AbModeData *mode_data)
     if (!base_mode_running(mode_data->base)) // if it's not running, do nothing
         return;
 
-    base_mode_decrement_current_time(&mode_data->base);
+    base_mode_decrement_current_time(mode_data->base);
 
     const bool prep_time_running = base_mode_prep_time(mode_data->base);
     if (prep_time_running)
         return;
 
-    mode_data->base.current_timer = &mode_data->current_time;
+    mode_data->base->current_timer = &mode_data->current_time;
 
     if (base_mode_current_time(mode_data->base) == 0)
     {
-        base_mode_set_running(&mode_data->base, false);
+        base_mode_set_running(mode_data->base, false);
         return;
     }
 }
 
 void ab_mode_print(AbModeData *mode_data)
 {
-    printf("AB(time: %d s, running: %s, prep: %s, training: %s, round: %d)\n",
-           base_mode_current_time(mode_data->base),
-           (base_mode_running(mode_data->base)) ? "true" : "false",
-           (base_mode_prep_time(mode_data->base)) ? "true" : "false",
-           (mode_data->base.round_info.training) ? "true" : "false",
-           mode_data->base.round_info.current_round);
+    uart_printf(
+        "AB(time: %d s, running: %s, prep: %s, training: %s, round: %d)\n",
+        base_mode_current_time(mode_data->base),
+        (base_mode_running(mode_data->base)) ? "true" : "false",
+        (base_mode_prep_time(mode_data->base)) ? "true" : "false",
+        (mode_data->base->round_info->training) ? "true" : "false",
+        mode_data->base->round_info->current_round);
 }
 
 void ab_mode_display(DisplayState *display, AbModeData *mode_data)
@@ -85,10 +87,17 @@ void ab_mode_display(DisplayState *display, AbModeData *mode_data)
     sprintf(display->right_display, "%s", "AB ");
 
     base_mode_display_semaphor(display, mode_data->base);
-    base_mode_round_display(&mode_data->base, display->middle_display);
+    base_mode_round_display(mode_data->base, display->middle_display);
 }
 
-void ab_mode_reset_state(AbModeData *mode_data, InitializationData init_data)
+void ab_mode_reset_state(AbModeData *mode_data, InitializationData *init_data)
 {
-    base_mode_reset_state(&mode_data->base, init_data);
+    base_mode_reset_state(mode_data->base, init_data);
+}
+
+void ab_mode_free(void **mode_data)
+{
+    AbModeData **casted_mode_data = (AbModeData **)(mode_data);
+    base_mode_free_internal(&(*casted_mode_data)->base);
+    base_mode_free(mode_data);
 }

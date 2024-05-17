@@ -1,32 +1,39 @@
 #include "base.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <lib/display/utils.h>
+#include <display.h>
+#include <data_model.h>
+#include <logging.h>
 
-void base_mode_init(BaseModeData *mode_data,
-                    InitializationData init_data,
-                    void (*next_step_func)(void *),
-                    void (*handle_sec_tic_func)(void *),
-                    void (*print_func)(void *),
-                    void (*reset_state_func)(void *, InitializationData),
-                    void (*display)(DisplayState *, void *))
+BaseModeData *base_mode_init(
+    InitializationData *init_data,
+    NextStepCallback_t *next_step_func,
+    HandleSecTickCallback_t *handle_sec_tic_func,
+    PrintCallback_t *print_func,
+    ResetStateCallback_t *reset_state_func,
+    DisplayCallback_t *display_func,
+    FreeCallback_t *free_func)
 {
+    BaseModeData *mode_data = (BaseModeData *)malloc(sizeof(BaseModeData));
     if (mode_data == NULL)
-        return;
+        return NULL;
 
+    mode_data->round_info = (RoundInfo *)malloc(sizeof(RoundInfo));
     mode_data->next_step = next_step_func;
     mode_data->handle_sec_tic = handle_sec_tic_func;
     mode_data->print = print_func;
     mode_data->reset_state = reset_state_func;
-    mode_data->free = &base_mode_free;
-    mode_data->display = display;
+    mode_data->free = free_func;
+    mode_data->display = display_func;
 
     base_mode_reset_state(mode_data, init_data);
+
+    return mode_data;
 }
 
-void base_mode_reset_state(BaseModeData *mode_data, InitializationData init_data)
+void base_mode_reset_state(BaseModeData *mode_data, InitializationData *init_data)
 {
-    if (mode_data == NULL)
+    if (mode_data == NULL || init_data == NULL)
         return;
 
     mode_data->running = false;
@@ -35,12 +42,12 @@ void base_mode_reset_state(BaseModeData *mode_data, InitializationData init_data
     base_mode_restore_prep_time(mode_data);
     mode_data->current_timer = &mode_data->_prep_timer;
 
-    round_info_init(&mode_data->round_info, init_data.training_rounds_count);
+    round_info_init(mode_data->round_info, init_data->training_rounds_count);
 }
 
 void base_mode_restore_prep_time(BaseModeData *mode_data)
 {
-    mode_data->_prep_timer = mode_data->init_data.prep_time;
+    mode_data->_prep_timer = mode_data->init_data->prep_time;
 }
 
 void base_mode_set_current_time(BaseModeData *mode_data, int value)
@@ -59,9 +66,9 @@ void base_mode_decrement_current_time(BaseModeData *mode_data)
     *(mode_data->current_timer) -= 1;
 }
 
-int base_mode_current_time(BaseModeData mode_data)
+int base_mode_current_time(BaseModeData *mode_data)
 {
-    return *(mode_data.current_timer);
+    return *(mode_data->current_timer);
 }
 
 void base_mode_set_running(BaseModeData *mode_data, bool running)
@@ -69,7 +76,7 @@ void base_mode_set_running(BaseModeData *mode_data, bool running)
     mode_data->running = running;
     if (mode_data->running)
     {
-        mode_data->_prep_timer = mode_data->init_data.prep_time;
+        mode_data->_prep_timer = mode_data->init_data->prep_time;
         mode_data->current_timer = &mode_data->_prep_timer;
     }
 
@@ -77,20 +84,27 @@ void base_mode_set_running(BaseModeData *mode_data, bool running)
         base_mode_next_round(mode_data);
 }
 
-bool base_mode_running(BaseModeData mode_data)
+bool base_mode_running(BaseModeData *mode_data)
 {
-    return mode_data.running;
+    if (mode_data == NULL)
+        return false;
+    return mode_data->running;
 }
 
-bool base_mode_prep_time(BaseModeData mode_data)
+bool base_mode_prep_time(BaseModeData *mode_data)
 {
-    return mode_data._prep_timer > 0;
+    if (mode_data == NULL)
+        return false;
+    return mode_data->_prep_timer > 0;
 }
 
-bool base_mode_in_warning_time(BaseModeData mode_data)
+bool base_mode_in_warning_time(BaseModeData *mode_data)
 {
+    if (mode_data == NULL)
+        return false;
+
     if (!base_mode_prep_time(mode_data))
-        return base_mode_current_time(mode_data) <= mode_data.init_data.warning_time;
+        return base_mode_current_time(mode_data) <= mode_data->init_data->warning_time;
     return false;
 }
 
@@ -137,7 +151,7 @@ void base_mode_next_round(BaseModeData *mode_data)
     if (mode_data == NULL)
         return;
 
-    round_info_next_round(&mode_data->round_info);
+    round_info_next_round(mode_data->round_info);
 }
 
 void base_mode_prev_round(BaseModeData *mode_data)
@@ -145,7 +159,7 @@ void base_mode_prev_round(BaseModeData *mode_data)
     if (mode_data == NULL)
         return;
 
-    round_info_prev_round(&mode_data->round_info);
+    round_info_prev_round(mode_data->round_info);
 }
 
 void round_info_init(RoundInfo *round_info, int training_rounds_count)
@@ -164,15 +178,15 @@ void base_mode_round_display(BaseModeData *mode_data, unsigned char *target)
         return;
 
     // there are two digits for round
-    if (mode_data->round_info.training)
+    if (mode_data->round_info->training)
     {
         target[0] = 'P';
-        target[1] = mode_data->round_info.current_round % 10 + '0';
+        target[1] = mode_data->round_info->current_round % 10 + '0';
         return;
     }
 
     // competition round
-    sprintf(target, "%2d", mode_data->round_info.current_round % 100);
+    snprintf(target, MIDDLE_DISPLAY_SIZE, "%2d", mode_data->round_info->current_round % 100);
 }
 
 void base_mode_free(void **mode_data)
@@ -183,19 +197,23 @@ void base_mode_free(void **mode_data)
     *mode_data = NULL;
 }
 
-bool round_info_first_competition_round(RoundInfo round_info)
+bool round_info_first_competition_round(RoundInfo *round_info)
 {
-    return round_info.current_round == 1 && !round_info.training;
+    if (round_info == NULL)
+        return false;
+    return round_info->current_round == 1 && !round_info->training;
 }
 
 bool base_mode_current_timer_is_prep(BaseModeData *mode_data)
 {
+    if (mode_data == NULL)
+        return false;
     return mode_data->current_timer == &mode_data->_prep_timer;
 }
 
-void base_mode_display_semaphor(DisplayState *display, BaseModeData mode_data)
+void base_mode_display_semaphor(DisplayState *display, BaseModeData *mode_data)
 {
-    if (display == NULL)
+    if (display == NULL || mode_data == NULL)
         return;
 
     // set sempahor color
@@ -205,4 +223,12 @@ void base_mode_display_semaphor(DisplayState *display, BaseModeData mode_data)
         display->semaphor_display = SemaphorDisplayOrange;
     else
         display->semaphor_display = SemaphorDisplayGreen;
+}
+
+void base_mode_free_internal(BaseModeData **mode_data)
+{
+    free((*mode_data)->round_info);
+    (*mode_data)->round_info = NULL;
+    free(*mode_data);
+    *mode_data = NULL;
 }

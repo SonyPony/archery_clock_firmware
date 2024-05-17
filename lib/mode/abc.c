@@ -2,21 +2,22 @@
 #include "ab.h"
 #include <stdlib.h>
 #include <stdio.h> // TODO delete
+#include <logging.h>
 
-AbcModeData *abc_mode_init(InitializationData init_data)
+AbcModeData *abc_mode_init(InitializationData *init_data)
 {
     AbcModeData *mode_data = (AbcModeData *)malloc(sizeof(AbcModeData));
     if (mode_data == NULL)
         return NULL;
 
-    base_mode_init(
-        &mode_data->base,
+    mode_data->base = base_mode_init(
         init_data,
-        (void (*)(void *)) & ab_mode_next_step,
-        (void (*)(void *)) & ab_mode_handle_sec_tick,
-        (void (*)(void *)) & ab_mode_print,
-        (void (*)(void *, InitializationData)) & ab_mode_reset_state,
-        (void (*)(DisplayState *, void *)) & abc_mode_display);
+        (NextStepCallback_t *)&ab_mode_next_step,
+        (HandleSecTickCallback_t *)&ab_mode_handle_sec_tick,
+        (PrintCallback_t *)&abc_mode_print,
+        (ResetStateCallback_t *)&ab_mode_reset_state,
+        (DisplayCallback_t *)&abc_mode_display,
+        (FreeCallback_t *)&ab_mode_free);
 
     return mode_data;
 }
@@ -32,12 +33,13 @@ void abc_mode_display(DisplayState *display, AbcModeData *mode_data)
     sprintf(display->right_display, "%s", "ABC");
 }
 
-void abc_model_print(AbcModeData *mode_data)
+void abc_mode_print(AbcModeData *mode_data)
 {
-    printf("ABC(time: %d s, running: %s, prep: %s, training: %s, round: %d)\n",
-           base_mode_current_time(mode_data->base),
-           (base_mode_running(mode_data->base)) ? "true" : "false",
-           (base_mode_prep_time(mode_data->base)) ? "true" : "false",
-           (mode_data->base.round_info.training) ? "true" : "false",
-           mode_data->base.round_info.current_round);
+    uart_printf(
+        "ABC(time: %d s, running: %s, prep: %s, training: %s, round: %d)\n",
+        base_mode_current_time(mode_data->base),
+        (base_mode_running(mode_data->base)) ? "true" : "false",
+        (base_mode_prep_time(mode_data->base)) ? "true" : "false",
+        (mode_data->base->round_info->training) ? "true" : "false",
+        mode_data->base->round_info->current_round);
 }
