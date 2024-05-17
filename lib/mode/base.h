@@ -5,6 +5,15 @@
 #include <data_model.h>
 #include <display.h>
 
+#define BASE_MODE_HANDLE_NEXT_STEP() { \
+    if(base_mode_running(mode_data->base) && base_mode_prep_time(mode_data->base)) \
+        return; \
+    if(mode_data->base->paused) { \
+        base_mode_resume(mode_data->base); \
+        return; \
+    } \
+}
+
 typedef struct
 {
     int current_round;

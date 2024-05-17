@@ -62,9 +62,7 @@ void finals_mode_next_step(FinalsModeData *mode_data)
     if (mode_data == NULL)
         return;
 
-    // prep time can't be skipped
-    if (base_mode_running(mode_data->base) && base_mode_prep_time(mode_data->base))
-        return;
+    BASE_MODE_HANDLE_NEXT_STEP();
 
     if (!base_mode_running(mode_data->base))
     {                                                 // not running -> run;

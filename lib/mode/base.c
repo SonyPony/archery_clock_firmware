@@ -37,6 +37,7 @@ void base_mode_reset_state(BaseModeData *mode_data, InitializationData *init_dat
         return;
 
     mode_data->running = false;
+    mode_data->paused = false;
     mode_data->init_data = init_data;
 
     base_mode_restore_prep_time(mode_data);
@@ -231,4 +232,22 @@ void base_mode_free_internal(BaseModeData **mode_data)
     (*mode_data)->round_info = NULL;
     free(*mode_data);
     *mode_data = NULL;
+}
+
+void base_mode_pause(BaseModeData *mode_data)
+{
+    if(mode_data == NULL)
+        return;
+
+    mode_data->paused = true;
+    mode_data->running = false;
+}
+
+void base_mode_resume(BaseModeData *mode_data)
+{
+    if(mode_data == NULL)
+        return;
+
+    mode_data->paused = false;
+    mode_data->running = true;
 }
