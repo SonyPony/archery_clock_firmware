@@ -11,6 +11,10 @@
 #include <buffer.h>
 #include <shift_register.h>
 #include <display.h>
+#include <message_info.h>
+#include <stdlib.h>
+#include <parser.h>
+#include <string.h> // TODO delete?
 
 // message buffer
 #define MESSAGE_BUFFER_SIZE 128
@@ -57,7 +61,6 @@ void initialized_mcu()
   buffer_clear(&message_buffer);
 }
 
-
 // main function with loop
 int main(void)
 {
@@ -68,16 +71,38 @@ int main(void)
   uint8_t io = 255;
   io++;
 
+  // TODO delete dummy
+  const uint8_t message_stream[] = "asd<a<1>fg<001000302F-I> <700300>s";
+  strncpy(message_buffer.data, message_stream, strlen(message_stream));
+  message_buffer_data_end_idx = strlen(message_stream);
+
+  MessageInfo msg_info;
+
   while (1)
   {
+    parse_message_info(&message_buffer, &msg_info);
+    if (!message_info_valid(&msg_info))
+      continue;
 
     i_var++;
     if (milis() - last_time > 1000)
     {
+      UART1_SendData8('a');
       last_time = milis();
       GPIOex_WriteReverse(&led_pin);
     }
   }
+
+  // while (1)
+  // {
+
+  // i_var++;
+  // if (milis() - last_time > 1000)
+  // {
+  //   last_time = milis();
+  //   GPIOex_WriteReverse(&led_pin);
+  // }
+  // }
 
   return 0;
 }
