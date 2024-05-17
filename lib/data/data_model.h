@@ -1,6 +1,8 @@
 #ifndef DATA_MODEL_H
 #define DATA_MODEL_H
 
+#define PREP_TIME 10    // in seconds
+
 typedef enum
 {
     AB_TurnType,
