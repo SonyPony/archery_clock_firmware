@@ -1,0 +1,18 @@
+#include "logging.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <uart.h>
+#include <string.h>
+
+uint8_t print_buffer[512];
+void uart_printf(const char *format, ...)
+{
+    memset(print_buffer, 0, 512);
+
+    va_list args;
+    va_start(args, format);
+    vsprintf(print_buffer, format, args);
+    va_end(args);
+
+    uart_send(PC_UART_CHANNEL, print_buffer);
+}

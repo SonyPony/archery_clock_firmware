@@ -15,8 +15,8 @@
 #include <parser.h>
 #include <string.h> // TODO delete?
 #include <uart.h>
-#include <stdarg.h> // TODO delete?
-#include <stdio.h>  // TODO delete?
+#include <logging.h>
+
 
 // message buffer
 #define MESSAGE_BUFFER_SIZE 512
@@ -25,7 +25,6 @@ volatile int message_buffer_data_end_idx = 0;
 Buffer message_buffer = {.data = message_buffer_data, .size = MESSAGE_BUFFER_SIZE, .data_end_idx = &message_buffer_data_end_idx};
 
 // UART channels
-#define PC_UART_CHANNEL 1
 #define WIFI_UART_CHANNEL 3
 
 // ports definition
@@ -41,17 +40,6 @@ DisplayState display_state;
 ShiftRegister shift_register;
 DisplayController display_controller;
 
-uint8_t buffer[MESSAGE_BUFFER_SIZE];
-void uart_printf(const char* format, ...) {
-  memset(buffer, 0, MESSAGE_BUFFER_SIZE);
-
-  va_list args;
-  va_start(args, format);
-  vsprintf(buffer, format, args);
-  va_end(args);
-
-  uart_send(PC_UART_CHANNEL, buffer);
-}
 
 void initialized_mcu()
 {
