@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <parser.h>
 #include <string.h> // TODO delete?
+#include <stm8s_uart1.h>
 
 // message buffer
 #define MESSAGE_BUFFER_SIZE 128
@@ -43,9 +44,14 @@ void initialized_mcu()
   CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1); // 16MHz from internal RC oscillator
   init_milis();
 
+  // init uart
   UART3_Init(115200, UART3_WORDLENGTH_8D, UART3_STOPBITS_1, UART3_PARITY_NO, UART3_MODE_TXRX_ENABLE);
   UART3_ITConfig(UART3_IT_RXNE_OR, ENABLE);
   UART3_Cmd(ENABLE);
+
+  UART1_Init(115200, UART1_WORDLENGTH_8D, UART1_STOPBITS_1, UART1_PARITY_NO, UART1_SYNCMODE_CLOCK_DISABLE, UART1_MODE_TXRX_ENABLE);
+  UART1_ITConfig(UART1_IT_RXNE_OR, ENABLE);
+  UART1_Cmd(ENABLE);
 
   enableInterrupts();
 
