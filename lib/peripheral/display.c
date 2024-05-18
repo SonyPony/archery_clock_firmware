@@ -110,7 +110,7 @@ void display_state_print(DisplayState *display_state)
     else if (display_state->semaphor_display == SemaphorDisplayRed)
         semaphor = 'R';
 
-    uart_printf(
+    log(
         "Display(left: \"%s\", middle: \"%s\", right: \"%s\", semaphor: \"%c\"",
         display_state->left_display,
         display_state->middle_display,

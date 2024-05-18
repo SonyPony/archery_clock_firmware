@@ -5,7 +5,7 @@
 #include <string.h>
 
 uint8_t print_buffer[512];
-void uart_printf(const char *format, ...)
+void log(const char *format, ...)
 {
     memset(print_buffer, 0, 512);
 

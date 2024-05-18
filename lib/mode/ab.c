@@ -58,7 +58,7 @@ void ab_mode_handle_sec_tick(AbModeData *mode_data)
 
 void ab_mode_print(AbModeData *mode_data)
 {
-    uart_printf(
+    log(
         "AB(time: %d s, running: %s, prep: %s, training: %s, round: %d)\n\r",
         base_mode_current_time(mode_data->base),
         (base_mode_running(mode_data->base)) ? "true" : "false",

@@ -5,6 +5,6 @@
 
 #define PC_UART_CHANNEL 1
 
-void uart_printf(const char *format, ...);
+void log(const char *format, ...);
 
 #endif

@@ -111,7 +111,7 @@ void finals_mode_handle_sec_tick(FinalsModeData *mode_data)
 
 void finals_mode_print(FinalsModeData *mode_data)
 {
-    uart_printf(
+    log(
         "Finals(time: %d s, turn: %s, running: %s, prep: %s, training: %s, round: %d)\n\r",
         base_mode_current_time(mode_data->base),
         (mode_data->current_turn == FinalsLeftTurn) ? "L" : "R",
