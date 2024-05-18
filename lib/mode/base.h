@@ -14,6 +14,17 @@
     } \
 }
 
+#define BASE_MODE_HANDLE_SEC_TICK() { \
+    if(!base_mode_running(mode_data->base)) \
+        return; \
+\
+    base_mode_decrement_current_time(mode_data->base); \
+\
+    const bool prep_time_running =  base_mode_prep_time(mode_data->base); \
+    if(prep_time_running) \
+        return; \
+}
+
 typedef struct
 {
     int current_round;
@@ -38,6 +49,7 @@ typedef struct
     InitializationData *init_data; // in seconds
     int *current_timer;
     bool running;
+    bool paused;
 
     RoundInfo *round_info;
 
@@ -62,8 +74,9 @@ BaseModeData *base_mode_init(
     DisplayCallback_t *display_func,
     FreeCallback_t *free_func);
 
+void base_mode_pause(BaseModeData *mode_data);
+void base_mode_resume(BaseModeData *mode_data);
 void base_mode_reset_state(BaseModeData *mode_data, InitializationData *init_data);
-
 void base_mode_restore_prep_time(BaseModeData *mode_data);
 void base_mode_set_current_time(BaseModeData *mode_data, int value);
 void base_mode_decrement_current_time(BaseModeData *mode_data);

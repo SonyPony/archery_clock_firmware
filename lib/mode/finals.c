@@ -88,14 +88,7 @@ void finals_mode_handle_sec_tick(FinalsModeData *mode_data)
     if (mode_data == NULL)
         return;
 
-    if (!base_mode_running(mode_data->base)) // if it's not running, do nothing
-        return;
-
-    base_mode_decrement_current_time(mode_data->base);
-
-    const bool prep_time_running = base_mode_prep_time(mode_data->base);
-    if (prep_time_running)
-        return;
+    BASE_MODE_HANDLE_SEC_TICK();
 
     if (base_mode_current_timer_is_prep(mode_data->base))
     {
