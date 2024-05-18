@@ -6,23 +6,44 @@
 #include <display.h>
 
 #define BASE_MODE_HANDLE_NEXT_STEP() { \
+    /* prep time can't be skipped */ \
     if(base_mode_running(mode_data->base) && base_mode_prep_time(mode_data->base)) \
         return; \
     if(mode_data->base->paused) { \
         base_mode_resume(mode_data->base); \
         return; \
     } \
+    if(mode_data->base->is_break) { \
+        mode_data->base->is_break = false; \
+        mode_data->base->_break_timer = 0; \
+    } \
 }
 
 #define BASE_MODE_HANDLE_SEC_TICK() { \
+    if(mode_data->base->is_break) { /* handle break */ \
+        mode_data->base->_break_timer--; \
+        if(mode_data->base->_break_timer <= 0) { \
+            mode_data->base->is_break = false; \
+            mode_data->base->next_step(mode_data); \
+        } \
+        return; \
+    } \
+\
     if(!base_mode_running(mode_data->base)) \
         return; \
-\
+    /* handle prep time */ \
     base_mode_decrement_current_time(mode_data->base); \
 \
     const bool prep_time_running =  base_mode_prep_time(mode_data->base); \
     if(prep_time_running) \
         return; \
+}
+
+#define BASE_MODE_DISPLAY() { \
+    if(mode_data->base->is_break) { \
+        base_mode_display_break(display, mode_data->base); \
+        return; \
+    } \
 }
 
 typedef struct
@@ -50,10 +71,12 @@ typedef struct
     int *current_timer;
     bool running;
     bool paused;
+    bool is_break;
 
     RoundInfo *round_info;
 
-    // prep timer
+    // timers
+    int _break_timer;
     int _prep_timer;
 
     // methods
@@ -74,6 +97,14 @@ BaseModeData *base_mode_init(
     DisplayCallback_t *display_func,
     FreeCallback_t *free_func);
 
+/**
+ * @brief base_mode_break Starts a break time. Can only be started if the mode is
+ * not running. If it's running, it will do nothing.
+ * @param break_time Break time in seconds.
+*/
+void base_mode_break(BaseModeData *mode_data, int break_time);
+
+void base_mode_display_break(DisplayState *display, BaseModeData *mode_data);
 void base_mode_pause(BaseModeData *mode_data);
 void base_mode_resume(BaseModeData *mode_data);
 void base_mode_reset_state(BaseModeData *mode_data, InitializationData *init_data);

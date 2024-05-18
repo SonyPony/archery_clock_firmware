@@ -133,6 +133,8 @@ void finals_mode_display(DisplayState *display, FinalsModeData *mode_data)
     if (display == NULL || mode_data == NULL)
         return;
 
+    BASE_MODE_DISPLAY();
+
     base_mode_display_semaphor(display, mode_data->base);
     // set time
     sprintf(display->left_display, "%3d", mode_data->left_current_time);

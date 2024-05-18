@@ -27,6 +27,8 @@ void abc_mode_display(DisplayState *display, AbcModeData *mode_data)
     if (display == NULL || mode_data == NULL)
         return;
 
+    BASE_MODE_DISPLAY();
+
     ab_mode_display(display, mode_data);
 
     // set turn (overwrite)

@@ -72,6 +72,8 @@ void ab_mode_display(DisplayState *display, AbModeData *mode_data)
     if (display == NULL || mode_data == NULL)
         return;
 
+    BASE_MODE_DISPLAY();
+
     // set time
     sprintf(display->left_display, "%3d", base_mode_current_time(mode_data->base));
     // set turn

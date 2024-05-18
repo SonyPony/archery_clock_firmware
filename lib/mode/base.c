@@ -39,6 +39,8 @@ void base_mode_reset_state(BaseModeData *mode_data, InitializationData *init_dat
     mode_data->running = false;
     mode_data->paused = false;
     mode_data->init_data = init_data;
+    mode_data->is_break = false;
+    mode_data->_break_timer = 0;
 
     base_mode_restore_prep_time(mode_data);
     mode_data->current_timer = &mode_data->_prep_timer;
@@ -236,7 +238,7 @@ void base_mode_free_internal(BaseModeData **mode_data)
 
 void base_mode_pause(BaseModeData *mode_data)
 {
-    if(mode_data == NULL)
+    if (mode_data == NULL)
         return;
 
     mode_data->paused = true;
@@ -245,9 +247,37 @@ void base_mode_pause(BaseModeData *mode_data)
 
 void base_mode_resume(BaseModeData *mode_data)
 {
-    if(mode_data == NULL)
+    if (mode_data == NULL)
         return;
 
     mode_data->paused = false;
     mode_data->running = true;
+}
+
+void base_mode_break(BaseModeData *mode_data, int break_time)
+{
+    if (mode_data == NULL)
+        return;
+
+    if (base_mode_running(mode_data)) // do nothing if the mode is running (can't insert a break)
+        return;
+
+    mode_data->is_break = true;
+    mode_data->_break_timer = break_time;
+}
+
+void base_mode_display_break(DisplayState *display, BaseModeData *mode_data)
+{
+    if (display == NULL || mode_data == NULL)
+        return;
+
+    const int current_time = mode_data->_break_timer;
+    const int minutes = current_time / 60;
+    const int seconds = current_time % 60;
+    display->semaphor_display = (current_time % 2) ? SemaphorDisplayOrange : SemaphorDisplayEmpty;
+    
+    sprintf(display->middle_display, "%s", "--");
+    sprintf(display->left_display, "%3d", minutes);
+    sprintf(display->right_display, "%3d", seconds);
+
 }

@@ -47,6 +47,8 @@ uint8_t symbol_to_display_segments(unsigned char symbol)
         return 0b01000110;
     case '>':
         return 0b01110000;
+    case '-':
+        return 0b01000000;
     default:
         return 0; // display off
     }
@@ -104,14 +106,16 @@ void display_state_print(DisplayState *display_state)
     if (display_state == NULL)
         return;
 
-    char semaphor = 'G';
+    char semaphor = '/';
     if (display_state->semaphor_display == SemaphorDisplayOrange)
         semaphor = 'O';
     else if (display_state->semaphor_display == SemaphorDisplayRed)
         semaphor = 'R';
+    else if (display_state->semaphor_display == SemaphorDisplayGreen)
+        semaphor = 'G';
 
     log(
-        "Display(left: \"%s\", middle: \"%s\", right: \"%s\", semaphor: \"%c\"",
+        "Display(left: \"%s\", middle: \"%s\", right: \"%s\", semaphor: \"%c\")",
         display_state->left_display,
         display_state->middle_display,
         display_state->right_display,
