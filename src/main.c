@@ -1,5 +1,5 @@
-#include "stm8s.h"
-#include "stm8s_it.h"
+#include <stm8s.h>
+#include <stm8s_it.h>
 #include <stm8s_gpio.h>
 #include <stm8s_tim4.h>
 #include <stm8s_itc.h>
@@ -16,7 +16,7 @@
 #include <string.h> // TODO delete?
 #include <uart.h>
 #include <logging.h>
-
+#include <mode_manager.h>
 
 // message buffer
 #define MESSAGE_BUFFER_SIZE 512
@@ -34,12 +34,13 @@ const PortLinkedPin sr_data_pin = {.port = GPIOD, .pin = GPIO_PIN_3};
 const PortLinkedPin sr_cs_pin = {.port = GPIOD, .pin = GPIO_PIN_2};
 const PortLinkedPin beeper_pin = {.port = GPIOB, .pin = GPIO_PIN_5};
 
-// TODO move to display
 // display definitions
 DisplayState display_state;
 ShiftRegister shift_register;
 DisplayController display_controller;
 
+// mode handling
+ModeManager mode_manager;
 
 void initialized_mcu()
 {
@@ -65,6 +66,49 @@ void initialized_mcu()
 
   // clear message buffer
   buffer_clear(&message_buffer);
+
+  // modes handling
+  mode_manager_init(&mode_manager);
+}
+
+void test(void* mode_data, BaseModeData* base_mode_data)
+{
+  log("start-----------------------------------------\n\r");
+  base_mode_data->next_step(mode_data);
+
+  for (int i = 0; i < 35; i++)
+  {
+    log("%d: ", i);
+    base_mode_data->display(&display_state, mode_data);
+    display_state_print(&display_state);
+    log(",  ");
+    base_mode_data->print(mode_data);
+    base_mode_data->handle_sec_tic(mode_data);
+
+    if (i == 3)
+    {
+      //base_mode_data->running = false;
+      //log("STOP\n\r");
+      // base_mode_pause(base_mode_data);
+    }
+
+    if (i == 5)
+    {
+      base_mode_break(base_mode_data, 5);
+      log("BREAK\n\r");
+      //base_mode_data->next_step(mode_data);
+    }
+
+    if (i == 21)
+    {
+      base_mode_break(base_mode_data, 5);
+      log("BREAK\n\r");
+      //log("NEXT STEP\n");
+      // base_mode_next_round(base_mode_data);
+      // base_mode_data->next_step(mode_data);
+    }
+  }
+  base_mode_data->free(&mode_data);
 }
 
 // main function with loop
@@ -72,31 +116,43 @@ int main(void)
 {
   initialized_mcu();
 
-  uint8_t i_var = 1;
   uint16_t last_time = 0;
-  uint8_t io = 255;
-  io++;
+  void* command = NULL;
 
   // TODO delete dummy
-  const uint8_t message_stream[] = "asd<a<1>fg<001000302F-I> <700300>s";
+  const uint8_t message_stream[] = "asd<a<1>fg<001000302AB-> <700300>s";
   strncpy(message_buffer.data, message_stream, strlen(message_stream));
   message_buffer_data_end_idx = strlen(message_stream);
 
-  MessageInfo msg_info;
+  
 
   while (1)
   {
-    parse_message_info(&message_buffer, &msg_info);
-    if (!message_info_valid(&msg_info))
-      continue;
+    // parse input messages
+    command = parse_message(&message_buffer);
 
-    i_var++;
-    if (milis() - last_time > 1000)
+    // clock functionality
+    if (milis() - last_time > 1000)   // ticking second
     {
-
       last_time = milis();
       GPIOex_WriteReverse(&led_pin);
+
+      //if(command == NULL)
+    //  continue;
     }
+
+    
+
+    // handle commands
+    mode_manager_process_commands(&mode_manager, command);
+    const MessageType command_type = ((BaseCommand*)command)->type;
+    if(command_type == InitializationMessageType) {
+      test(mode_manager.mode_data, mode_manager.base_mode_data);
+    }
+
+    // free command memory, cleanups
+    free(command);  
+    command = NULL;
   }
 
   return 0;
