@@ -1,6 +1,8 @@
 #ifndef DATA_MODEL_H
 #define DATA_MODEL_H
 
+#include <message_info.h>
+
 #define PREP_TIME 10    // in seconds
 
 typedef enum
@@ -12,8 +14,14 @@ typedef enum
     FinalsIndividual_TurnType,
 } TurnType;
 
+typedef struct 
+{
+    MessageType type;
+} Command;
+
 typedef struct
 {
+    MessageType type;
     int time_per_round;
     int warning_time;
     int training_rounds_count;
@@ -24,6 +32,7 @@ typedef struct
 
 typedef struct
 {
+    MessageType type;
     int break_time;
 } BreakCommand;
 

@@ -1,6 +1,7 @@
 #include "parser.h"
 #include <core.h>
 #include <string.h>
+#include <stdlib.h>
 
 bool message_info_valid(MessageInfo *msg_info)
 {
@@ -39,6 +40,7 @@ void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, Initializa
     msg->time_per_round = parse_int(raw_buffer, 3);            // 3 decimals are reserved for time per round
     msg->warning_time = parse_int(raw_buffer + 3, 3);          // 3 decimals are reserved for warning time
     msg->training_rounds_count = parse_int(raw_buffer + 6, 2); // 2 decimals
+    msg->prep_time = PREP_TIME;
 
     if (strncmp(raw_turn_type, "AB-", 3) == 0)
         msg->turn_type = AB_TurnType;
@@ -112,4 +114,64 @@ void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
 
     memmove(buffer->data, buffer->data + msg_info->endIdx + 1, buffer->size - msg_info->endIdx - 1);
     *buffer->data_end_idx = (*buffer->data_end_idx) - (msg_info->endIdx + 1);
+}
+
+void* parse_message(Buffer *buffer) 
+{
+    if(buffer == NULL)
+        return NULL;
+
+    MessageInfo msg_info;
+    void* result = NULL;
+    parse_message_info(buffer, &msg_info);
+    if (!message_info_valid(&msg_info))
+      return NULL;
+
+    const MessageType parsed_msg_type = parse_message_type(&msg_info, &buffer);
+
+    switch (parsed_msg_type)
+    {
+    case NextStepMessageType:
+    case StartMessageType:
+    case StopMessageType:
+    case PreviousRoundMessageType:
+    case NextRoundMessageType:
+    case PauseMessageType:
+        Command* command = (Command*)malloc(sizeof(Command));
+        if(command == NULL)
+            return NULL;
+        command->type = parsed_msg_type;
+        result = command;
+        break;
+
+    case BreakMessageType:
+      if (break_message_valid(&msg_info))
+      {
+        BreakCommand* break_command = (BreakCommand*)malloc(sizeof(BreakCommand));
+        if(break_command == NULL)
+            return NULL;
+        parse_break_data(&buffer, &msg_info, break_command);
+        break_command->type = BreakMessageType;
+
+        result = break_command;
+      }
+      break;
+
+    case InitializationMessageType:
+      if (initialization_message_valid(&msg_info))
+      {
+        InitializationCommand* init_command = (InitializationCommand*)malloc(sizeof(InitializationCommand));
+        if(init_command == NULL)
+            return NULL;
+        parse_initialization_data(&buffer, &msg_info, init_command);
+        init_command->prep_time = PREP_TIME;
+        init_command->type = InitializationMessageType;
+
+        result = init_command;
+      }
+      break;
+    }
+    // message parsed -> remove from buffer
+    remove_message_from_buffer(&msg_info, buffer);
+    return (void*)result;
 }

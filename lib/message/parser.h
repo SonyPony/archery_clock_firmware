@@ -51,6 +51,14 @@ void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, Initializa
 void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakCommand *msg);
 
 /**
+ * @brief parse_message It parses a message from the buffer. It allocates the space on the heap as well.
+ * @param buffer Message buffer.
+ * @return Returns a pointer to Command or InitializationCommand or BreakCommand. Commands have to be freed after processing.
+ * Or they will cause memory leaks.
+ */
+void *parse_message(Buffer *buffer);
+
+/**
  * @brief parse_message_info Parse the first found valid message info from the message buffer.
  * @param buffer Message buffer.
  * @param message_info Location where message info that points to the location of the buffer will be stored.
