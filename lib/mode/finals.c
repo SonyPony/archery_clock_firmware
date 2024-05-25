@@ -4,7 +4,7 @@
 #include <data_model.h>
 #include <logging.h>
 
-FinalsModeData *finals_mode_init(InitializationData *init_data)
+FinalsModeData *finals_mode_init(InitializationCommand *init_data)
 {
     FinalsModeData *mode_data = (FinalsModeData *)malloc(sizeof(FinalsModeData));
     if (mode_data == NULL)
@@ -121,7 +121,7 @@ void finals_mode_print(FinalsModeData *mode_data)
         mode_data->base->round_info->current_round);
 }
 
-void finals_mode_reset_state(FinalsModeData *mode_data, InitializationData *init_data)
+void finals_mode_reset_state(FinalsModeData *mode_data, InitializationCommand *init_data)
 {
     base_mode_reset_state(mode_data->base, init_data);
     finals_mode_end_round(mode_data);

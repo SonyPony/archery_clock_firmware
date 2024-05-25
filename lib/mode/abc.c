@@ -4,7 +4,7 @@
 #include <stdio.h> // TODO delete
 #include <logging.h>
 
-AbcModeData *abc_mode_init(InitializationData *init_data)
+AbcModeData *abc_mode_init(InitializationCommand *init_data)
 {
     AbcModeData *mode_data = (AbcModeData *)malloc(sizeof(AbcModeData));
     if (mode_data == NULL)

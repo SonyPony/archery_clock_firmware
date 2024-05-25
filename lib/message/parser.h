@@ -39,7 +39,7 @@ bool initialization_message_valid(MessageInfo *msg_info);
  * @param msg_info Message info that contains location of the initialization message.
  * @param msg Location where the parsed initialization data will be stored.
  */
-void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, InitializationData *msg);
+void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, InitializationCommand *msg);
 
 /**
  * @brief parse_break_data It extracts the break data from the buffer based on the
@@ -48,7 +48,7 @@ void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, Initializa
  * @param msg_info Message info that contains location of the initialization message.
  * @param msg Location where the parsed break data will be stored.
  */
-void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakData *msg);
+void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakCommand *msg);
 
 /**
  * @brief parse_message_info Parse the first found valid message info from the message buffer.

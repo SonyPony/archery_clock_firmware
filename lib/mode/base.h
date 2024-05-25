@@ -62,12 +62,12 @@ typedef void(NextStepCallback_t)(void *);
 typedef void(HandleSecTickCallback_t)(void *);
 typedef void(PrintCallback_t)(void *);
 typedef void(FreeCallback_t)(void **);
-typedef void(ResetStateCallback_t)(void *, InitializationData *);
+typedef void(ResetStateCallback_t)(void *, InitializationCommand *);
 typedef void(DisplayCallback_t)(DisplayState *, void *);
 
 typedef struct
 {
-    InitializationData *init_data; // in seconds
+    InitializationCommand *init_data; // in seconds
     int *current_timer;
     bool running;
     bool paused;
@@ -89,7 +89,7 @@ typedef struct
 } BaseModeData;
 
 BaseModeData *base_mode_init(
-    InitializationData *init_data,
+    InitializationCommand *init_data,
     NextStepCallback_t *next_step_func,
     HandleSecTickCallback_t *handle_sec_tic_func,
     PrintCallback_t *print_func,
@@ -107,7 +107,7 @@ void base_mode_break(BaseModeData *mode_data, int break_time);
 void base_mode_display_break(DisplayState *display, BaseModeData *mode_data);
 void base_mode_pause(BaseModeData *mode_data);
 void base_mode_resume(BaseModeData *mode_data);
-void base_mode_reset_state(BaseModeData *mode_data, InitializationData *init_data);
+void base_mode_reset_state(BaseModeData *mode_data, InitializationCommand *init_data);
 void base_mode_restore_prep_time(BaseModeData *mode_data);
 void base_mode_set_current_time(BaseModeData *mode_data, int value);
 void base_mode_decrement_current_time(BaseModeData *mode_data);

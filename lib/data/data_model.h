@@ -20,11 +20,11 @@ typedef struct
     TurnType turn_type;
     int prep_time;
     int turns_per_round; // A -> B -> A -> B -> ROUND 2 -> 2 turns per round;
-} InitializationData;
+} InitializationCommand;
 
 typedef struct
 {
     int break_time;
-} BreakData;
+} BreakCommand;
 
 #endif // RUN_DATA_H

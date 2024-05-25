@@ -4,7 +4,7 @@
 #include <base.h>
 #include <logging.h>
 
-AbcdModeData *abcd_mode_init(InitializationData *init_data)
+AbcdModeData *abcd_mode_init(InitializationCommand *init_data)
 {
     AbcdModeData *mode_data = (AbcdModeData *)malloc(sizeof(AbcdModeData));
     if (mode_data == NULL)
@@ -112,7 +112,7 @@ void abcd_mode_display(DisplayState *display, AbcdModeData *mode_data)
     base_mode_round_display(mode_data->base, display->middle_display);
 }
 
-void abcd_mode_reset_state(AbcdModeData *mode_data, InitializationData *init_data)
+void abcd_mode_reset_state(AbcdModeData *mode_data, InitializationCommand *init_data)
 {
     base_mode_reset_state(mode_data->base, init_data);
     mode_data->current_turn = AbTurn;

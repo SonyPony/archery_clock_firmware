@@ -21,11 +21,11 @@ typedef struct
     BaseModeData *base;
 } FinalsModeData;
 
-FinalsModeData *finals_mode_init(InitializationData *init_data);
+FinalsModeData *finals_mode_init(InitializationCommand *init_data);
 void finals_mode_next_step(FinalsModeData *mode_data);
 void finals_mode_handle_sec_tick(FinalsModeData *mode_data);
 void finals_mode_print(FinalsModeData *mode_data);
-void finals_mode_reset_state(FinalsModeData *mode_data, InitializationData *init_data);
+void finals_mode_reset_state(FinalsModeData *mode_data, InitializationCommand *init_data);
 void finals_mode_display(DisplayState *display, FinalsModeData *mode_data);
 void finals_mode_next_turn(FinalsModeData *mode_data);
 void finals_mode_end_round(FinalsModeData *mode_data);

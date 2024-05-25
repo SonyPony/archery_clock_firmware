@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <logging.h>
 
-AbModeData *ab_mode_init(InitializationData *init_data)
+AbModeData *ab_mode_init(InitializationCommand *init_data)
 {
     AbModeData *mode_data = (AbModeData *)malloc(sizeof(AbModeData));
     if (mode_data == NULL)
@@ -83,7 +83,7 @@ void ab_mode_display(DisplayState *display, AbModeData *mode_data)
     base_mode_round_display(mode_data->base, display->middle_display);
 }
 
-void ab_mode_reset_state(AbModeData *mode_data, InitializationData *init_data)
+void ab_mode_reset_state(AbModeData *mode_data, InitializationCommand *init_data)
 {
     base_mode_reset_state(mode_data->base, init_data);
 }

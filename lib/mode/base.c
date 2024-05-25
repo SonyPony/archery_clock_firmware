@@ -6,7 +6,7 @@
 #include <logging.h>
 
 BaseModeData *base_mode_init(
-    InitializationData *init_data,
+    InitializationCommand *init_data,
     NextStepCallback_t *next_step_func,
     HandleSecTickCallback_t *handle_sec_tic_func,
     PrintCallback_t *print_func,
@@ -31,7 +31,7 @@ BaseModeData *base_mode_init(
     return mode_data;
 }
 
-void base_mode_reset_state(BaseModeData *mode_data, InitializationData *init_data)
+void base_mode_reset_state(BaseModeData *mode_data, InitializationCommand *init_data)
 {
     if (mode_data == NULL || init_data == NULL)
         return;

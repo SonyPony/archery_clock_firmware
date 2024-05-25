@@ -26,7 +26,7 @@ bool initialization_message_valid(MessageInfo *msg_info)
     return msg_info->endIdx - msg_info->startIdx + 1 == 14;
 }
 
-void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, InitializationData *msg)
+void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, InitializationCommand *msg)
 {
     if (buffer == NULL || msg_info == NULL || msg == NULL)
         return;
@@ -61,7 +61,7 @@ void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, Initializa
     }
 }
 
-void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakData *msg)
+void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakCommand *msg)
 {
     if (buffer == NULL || msg_info == NULL || msg == NULL)
         return;
