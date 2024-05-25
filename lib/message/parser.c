@@ -2,6 +2,7 @@
 #include <core.h>
 #include <string.h>
 #include <stdlib.h>
+#include <data_model.h>
 
 bool message_info_valid(MessageInfo *msg_info)
 {
@@ -116,62 +117,55 @@ void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
     *buffer->data_end_idx = (*buffer->data_end_idx) - (msg_info->endIdx + 1);
 }
 
-void* parse_message(Buffer *buffer) 
+void *parse_message(Buffer *buffer)
 {
-    if(buffer == NULL)
+    if (buffer == NULL)
         return NULL;
 
     MessageInfo msg_info;
-    void* result = NULL;
+    void *result = NULL;
     parse_message_info(buffer, &msg_info);
     if (!message_info_valid(&msg_info))
-      return NULL;
+        return NULL;
 
-    const MessageType parsed_msg_type = parse_message_type(&msg_info, &buffer);
+    const MessageType parsed_msg_type = parse_message_type(&msg_info, buffer);
 
-    switch (parsed_msg_type)
+    if (parsed_msg_type == BreakMessageType)
     {
-    case NextStepMessageType:
-    case StartMessageType:
-    case StopMessageType:
-    case PreviousRoundMessageType:
-    case NextRoundMessageType:
-    case PauseMessageType:
-        Command* command = (Command*)malloc(sizeof(Command));
-        if(command == NULL)
-            return NULL;
-        command->type = parsed_msg_type;
-        result = command;
-        break;
-
-    case BreakMessageType:
-      if (break_message_valid(&msg_info))
-      {
-        BreakCommand* break_command = (BreakCommand*)malloc(sizeof(BreakCommand));
-        if(break_command == NULL)
-            return NULL;
-        parse_break_data(&buffer, &msg_info, break_command);
-        break_command->type = BreakMessageType;
-
-        result = break_command;
-      }
-      break;
-
-    case InitializationMessageType:
-      if (initialization_message_valid(&msg_info))
-      {
-        InitializationCommand* init_command = (InitializationCommand*)malloc(sizeof(InitializationCommand));
-        if(init_command == NULL)
-            return NULL;
-        parse_initialization_data(&buffer, &msg_info, init_command);
-        init_command->prep_time = PREP_TIME;
-        init_command->type = InitializationMessageType;
-
-        result = init_command;
-      }
-      break;
+        if (break_message_valid(&msg_info))
+        {
+            BreakCommand *break_command = (BreakCommand *)malloc(sizeof(BreakCommand));
+            if (break_command == NULL)
+                return NULL;
+            parse_break_data(buffer, &msg_info, break_command);
+            result = break_command;
+        }
     }
+
+    else if (parsed_msg_type == InitializationMessageType)
+    {
+        if (initialization_message_valid(&msg_info))
+        {
+            InitializationCommand *init_command = (InitializationCommand *)malloc(sizeof(InitializationCommand));
+            if (init_command == NULL)
+                return NULL;
+            parse_initialization_data(buffer, &msg_info, init_command);
+            init_command->prep_time = PREP_TIME;
+
+            result = init_command;
+        }
+    }
+
+    else    // NextStepMessageType, StartMessageType, StopMessageType, PreviousRoundMessageType, NextRoundMessageType, PauseMessageType
+    {
+        BaseCommand *base_command = (BaseCommand *)malloc(sizeof(BaseCommand));
+        if (base_command == NULL)
+            return NULL;
+        result = base_command;
+    }
+
+    ((BaseCommand *)result)->type = parsed_msg_type;
     // message parsed -> remove from buffer
     remove_message_from_buffer(&msg_info, buffer);
-    return (void*)result;
+    return (void *)result;
 }

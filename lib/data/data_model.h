@@ -14,11 +14,6 @@ typedef enum
     FinalsIndividual_TurnType,
 } TurnType;
 
-typedef struct 
-{
-    MessageType type;
-} Command;
-
 typedef struct
 {
     MessageType type;
@@ -35,5 +30,10 @@ typedef struct
     MessageType type;
     int break_time;
 } BreakCommand;
+
+typedef struct
+{
+    MessageType type;
+} BaseCommand;
 
 #endif // RUN_DATA_H
