@@ -22,7 +22,7 @@
 #define MESSAGE_BUFFER_SIZE 512
 volatile uint8_t message_buffer_data[MESSAGE_BUFFER_SIZE];
 volatile int message_buffer_data_end_idx = 0;
-Buffer message_buffer = {.data = message_buffer_data, .size = MESSAGE_BUFFER_SIZE, .data_end_idx = &message_buffer_data_end_idx};
+volatile Buffer message_buffer = {.data = message_buffer_data, .size = MESSAGE_BUFFER_SIZE, .data_end_idx = &message_buffer_data_end_idx};
 
 // UART channels
 #define WIFI_UART_CHANNEL 3

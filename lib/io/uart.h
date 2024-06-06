@@ -51,6 +51,6 @@ int uart_send_ready(uint8_t uart_idx);
  * @param uart_idx Target UART channel.
  * @param data_buffer Target data buffer where the read data will be stored.
  */
-inline void uart_read(uint8_t uard_idx, Buffer *data_buffer);
+inline void uart_read(uint8_t uard_idx, volatile Buffer *data_buffer);
 
 #endif

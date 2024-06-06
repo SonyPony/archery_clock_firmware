@@ -66,7 +66,7 @@ int uart_read_ready(uint8_t uart_idx)
     return 0;
 }
 
-inline void uart_read(uint8_t uard_idx, Buffer *data_buffer)
+inline void uart_read(uint8_t uard_idx, volatile Buffer *data_buffer)
 {
     if (data_buffer == NULL)
         return;
