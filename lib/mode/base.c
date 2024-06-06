@@ -43,7 +43,6 @@ void base_mode_reset_state(BaseModeData *mode_data, InitializationCommand *init_
     mode_data->_break_timer = 0;
 
     base_mode_restore_prep_time(mode_data);
-    mode_data->current_timer = &mode_data->_prep_timer;
 
     round_info_init(mode_data->round_info, init_data->training_rounds_count);
 }
@@ -51,6 +50,7 @@ void base_mode_reset_state(BaseModeData *mode_data, InitializationCommand *init_
 void base_mode_restore_prep_time(BaseModeData *mode_data)
 {
     mode_data->_prep_timer = mode_data->init_data->prep_time;
+    mode_data->current_timer = &mode_data->_prep_timer;
 }
 
 void base_mode_set_current_time(BaseModeData *mode_data, int value)
@@ -78,10 +78,7 @@ void base_mode_set_running(BaseModeData *mode_data, bool running)
 {
     mode_data->running = running;
     if (mode_data->running)
-    {
-        mode_data->_prep_timer = mode_data->init_data->prep_time;
-        mode_data->current_timer = &mode_data->_prep_timer;
-    }
+        base_mode_restore_prep_time(mode_data);
 
     else
         base_mode_next_round(mode_data);

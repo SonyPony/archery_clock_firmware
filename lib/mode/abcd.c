@@ -77,6 +77,9 @@ void abcd_mode_next_turn(AbcdModeData *mode_data)
 
     else
     {
+        // reset prep timer
+        base_mode_restore_prep_time(mode_data->base);
+
         mode_data->_current_turn_this_round++;
         mode_data->current_turn = (mode_data->current_turn == AbTurn) ? CdTurn : AbTurn;
         mode_data->current_time = mode_data->base->init_data->time_per_round;
