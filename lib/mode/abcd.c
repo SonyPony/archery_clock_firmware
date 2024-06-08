@@ -4,13 +4,14 @@
 #include <base.h>
 #include <logging.h>
 
-AbcdModeData *abcd_mode_init(InitializationCommand *init_data)
+void abcd_mode_init(AbcdModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data)
 {
-    AbcdModeData *mode_data = (AbcdModeData *)malloc(sizeof(AbcdModeData));
     if (mode_data == NULL)
         return NULL;
 
-    mode_data->base = base_mode_init(
+    mode_data->base = base_mode_data;
+    base_mode_init(
+        mode_data->base,
         init_data,
         (NextStepCallback_t *)&abcd_mode_next_step,
         (HandleSecTickCallback_t *)&abcd_mode_handle_sec_tick,

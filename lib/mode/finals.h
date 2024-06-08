@@ -21,7 +21,7 @@ typedef struct
     BaseModeData *base;
 } FinalsModeData;
 
-FinalsModeData *finals_mode_init(InitializationCommand *init_data);
+void finals_mode_init(FinalsModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data);
 void finals_mode_next_step(FinalsModeData *mode_data);
 void finals_mode_handle_sec_tick(FinalsModeData *mode_data);
 void finals_mode_print(FinalsModeData *mode_data);

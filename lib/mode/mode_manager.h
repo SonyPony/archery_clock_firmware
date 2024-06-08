@@ -4,14 +4,30 @@
 #include <base.h>
 #include <buffer.h>
 #include <data_model.h>
+#include <finals.h>
+#include <ab.h>
+#include <abc.h>
+#include <abcd.h>
 
 typedef struct
 {
     void *mode_data;
+    AbModeData *_ab_mode_data;
+    AbcModeData *_abc_mode_data;
+    AbcdModeData *_abcd_mode_data;
+    FinalsModeData *_finals_mode_data;
     BaseModeData *base_mode_data;
+    InitializationCommand *init_data;
 } ModeManager;
 
-void mode_manager_init(ModeManager *mode_manager);
+void mode_manager_init(
+    ModeManager *mode_manager,
+    BaseModeData *base_mode_data,
+    AbModeData *ab_mode_data,
+    AbcModeData *abc_mode_data,
+    AbcdModeData *abcd_mode_data,
+    FinalsModeData *finals_mode_data,
+    InitializationCommand *init_data);
 
 /**
  * @brief mode_manager_mode_init Initialized given mode based on the intialization data.

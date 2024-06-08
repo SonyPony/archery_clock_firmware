@@ -1,45 +1,63 @@
 #include <mode_manager.h>
-#include <finals.h>
-#include <ab.h>
-#include <abc.h>
-#include <abcd.h>
 #include <stdlib.h>
 #include <parser.h>
+#include <string.h>
 
-void mode_manager_init(ModeManager *mode_manager)
+void mode_manager_init(
+    ModeManager *mode_manager,
+    BaseModeData *base_mode_data,
+    AbModeData *ab_mode_data,
+    AbcModeData *abc_mode_data,
+    AbcdModeData *abcd_mode_data,
+    FinalsModeData *finals_mode_data,
+    InitializationCommand *init_data)
 {
-    if (mode_manager == NULL)
+    if (mode_manager == NULL || base_mode_data == NULL || ab_mode_data == NULL || abc_mode_data == NULL || abcd_mode_data == NULL || finals_mode_data == NULL || init_data == NULL)
         return;
 
-    mode_manager->base_mode_data = NULL;
+    mode_manager->_ab_mode_data = ab_mode_data;
+    mode_manager->_abc_mode_data = abc_mode_data;
+    mode_manager->_abcd_mode_data = abcd_mode_data;
+    mode_manager->_finals_mode_data = finals_mode_data;
+    mode_manager->base_mode_data = base_mode_data;
     mode_manager->mode_data = NULL;
+    mode_manager->init_data = init_data;
 }
 
 void mode_manager_mode_init(ModeManager *mode_manager, InitializationCommand *init_data)
 {
     if (init_data == NULL || mode_manager == NULL)
         return;
+    if (mode_manager->init_data == NULL)
+        return;
+
+    // copy init data TODO delete
+    // memcpy(mode_manager->init_data, init_data, sizeof(InitializationCommand));
 
     switch (init_data->turn_type)
     {
     case AB_TurnType:
-        mode_manager->mode_data = ab_mode_init(init_data);
+        ab_mode_init(mode_manager->_ab_mode_data, mode_manager->base_mode_data, mode_manager->init_data);
+        mode_manager->mode_data = mode_manager->_ab_mode_data;
         mode_manager->base_mode_data = ((AbModeData *)(mode_manager->mode_data))->base;
         break;
 
     case ABC_TurnType:
-        mode_manager->mode_data = abc_mode_init(init_data);
+        abc_mode_init(mode_manager->_abc_mode_data, mode_manager->base_mode_data, mode_manager->init_data);
+        mode_manager->mode_data = mode_manager->_abc_mode_data;
         mode_manager->base_mode_data = ((AbcModeData *)(mode_manager->mode_data))->base;
         break;
 
     case ABCD_TurnType:
-        mode_manager->mode_data = abcd_mode_init(init_data);
+        abcd_mode_init(mode_manager->_abcd_mode_data, mode_manager->base_mode_data, mode_manager->init_data);
+        mode_manager->mode_data = mode_manager->_abcd_mode_data;
         mode_manager->base_mode_data = ((AbcdModeData *)(mode_manager->mode_data))->base;
         break;
 
     case FinalsIndividual_TurnType:
     case FinalsTeams_TurnType:
-        mode_manager->mode_data = finals_mode_init(init_data);
+        finals_mode_init(mode_manager->_finals_mode_data, mode_manager->base_mode_data, mode_manager->init_data);
+        mode_manager->mode_data = mode_manager->_finals_mode_data;
         mode_manager->base_mode_data = ((FinalsModeData *)(mode_manager->mode_data))->base;
         break;
 
@@ -64,11 +82,12 @@ void mode_manager_process_commands(ModeManager *mode_manager, void *command)
 
     if (command_type == InitializationMessageType)
     {
-        // remove old mode data
+        // remove old mode data TODO check
         if (mode_manager_mode_data_valid(mode_manager))
         {
-            mode_manager->base_mode_data->free(&mode_manager->mode_data);
-            mode_manager->base_mode_data = NULL;
+            //mode_manager->base_mode_data->free(&mode_manager->mode_data);
+            //mode_manager->base_mode_data = NULL;
+            //mode_manager->mode_data = NULL;
         }
         mode_manager_mode_init(mode_manager, (InitializationCommand *)command);
     }
@@ -105,7 +124,7 @@ void mode_manager_process_commands(ModeManager *mode_manager, void *command)
             break;
 
         case BreakMessageType:
-            base_mode_break(base_mode_data, ((BreakCommand*)command)->break_time);
+            base_mode_break(base_mode_data, ((BreakCommand *)command)->break_time);
             break;
         }
     }

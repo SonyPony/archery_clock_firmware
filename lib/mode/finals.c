@@ -4,13 +4,14 @@
 #include <data_model.h>
 #include <logging.h>
 
-FinalsModeData *finals_mode_init(InitializationCommand *init_data)
+void finals_mode_init(FinalsModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data)
 {
-    FinalsModeData *mode_data = (FinalsModeData *)malloc(sizeof(FinalsModeData));
     if (mode_data == NULL)
         return NULL;
 
-    mode_data->base = base_mode_init(
+    mode_data->base = base_mode_data;
+    base_mode_init(
+        mode_data->base,
         init_data,
         (NextStepCallback_t *)&finals_mode_next_step,
         (HandleSecTickCallback_t *)&finals_mode_handle_sec_tick,

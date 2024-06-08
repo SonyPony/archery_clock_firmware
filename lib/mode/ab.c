@@ -3,13 +3,14 @@
 #include <stdlib.h>
 #include <logging.h>
 
-AbModeData *ab_mode_init(InitializationCommand *init_data)
+void ab_mode_init(AbModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data)
 {
-    AbModeData *mode_data = (AbModeData *)malloc(sizeof(AbModeData));
     if (mode_data == NULL)
         return NULL;
 
-    mode_data->base = base_mode_init(
+    mode_data->base = base_mode_data;
+    base_mode_init(
+        mode_data->base,
         init_data,
         (NextStepCallback_t *)&ab_mode_next_step,
         (HandleSecTickCallback_t *)&ab_mode_handle_sec_tick,

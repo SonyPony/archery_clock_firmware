@@ -5,7 +5,8 @@
 #include <data_model.h>
 #include <logging.h>
 
-BaseModeData *base_mode_init(
+void base_mode_init(
+    BaseModeData *mode,
     InitializationCommand *init_data,
     NextStepCallback_t *next_step_func,
     HandleSecTickCallback_t *handle_sec_tic_func,
@@ -14,7 +15,6 @@ BaseModeData *base_mode_init(
     DisplayCallback_t *display_func,
     FreeCallback_t *free_func)
 {
-    BaseModeData *mode_data = (BaseModeData *)malloc(sizeof(BaseModeData));
     if (mode_data == NULL)
         return NULL;
 

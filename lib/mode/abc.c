@@ -4,13 +4,14 @@
 #include <stdio.h> // TODO delete
 #include <logging.h>
 
-AbcModeData *abc_mode_init(InitializationCommand *init_data)
+void abc_mode_init(AbcModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data)
 {
-    AbcModeData *mode_data = (AbcModeData *)malloc(sizeof(AbcModeData));
     if (mode_data == NULL)
         return NULL;
 
-    mode_data->base = base_mode_init(
+    mode_data->base = base_mode_data;
+    base_mode_init(
+        mode_data->base,
         init_data,
         (NextStepCallback_t *)&ab_mode_next_step,
         (HandleSecTickCallback_t *)&ab_mode_handle_sec_tick,

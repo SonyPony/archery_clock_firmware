@@ -88,7 +88,8 @@ typedef struct
     DisplayCallback_t *display;
 } BaseModeData;
 
-BaseModeData *base_mode_init(
+void base_mode_init(
+    BaseModeData *mode_data,
     InitializationCommand *init_data,
     NextStepCallback_t *next_step_func,
     HandleSecTickCallback_t *handle_sec_tic_func,
