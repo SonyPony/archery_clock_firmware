@@ -9,7 +9,7 @@ bool message_info_valid(MessageInfo *msg_info)
     if (msg_info == NULL)
         return false;
 
-    return msg_info->startIdx != -1 && msg_info->endIdx != -1;
+    return msg_info->startIdx != -1 && msg_info->endIdx != -1 && msg_info->startIdx < msg_info->endIdx;
 }
 
 bool break_message_valid(MessageInfo *msg_info)
