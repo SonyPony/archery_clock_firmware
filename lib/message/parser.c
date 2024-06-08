@@ -37,7 +37,7 @@ void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, Initializa
     const volatile uint8_t *raw_turn_type = raw_buffer + 8;
 
     msg->turn_type = ABCD_TurnType; // default value
-    msg->turns_per_round = 1;
+    msg->turns_per_round = 2;
     msg->time_per_round = parse_int(raw_buffer, 3);            // 3 decimals are reserved for time per round
     msg->warning_time = parse_int(raw_buffer + 3, 3);          // 3 decimals are reserved for warning time
     msg->training_rounds_count = parse_int(raw_buffer + 6, 2); // 2 decimals
@@ -83,6 +83,7 @@ void parse_message_info(Buffer *buffer, MessageInfo *message_info)
 
     for (int i = 0; i < *buffer->data_end_idx; i++)
     {
+        // TODO check order
         if (buffer->data[i] == MESSAGE_START_SYMBOL)
             message_info->startIdx = i;
 
