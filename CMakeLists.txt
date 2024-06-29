@@ -40,6 +40,15 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(archery_clock_firmware archery_clock_firmware.cpp )
+target_sources(archery_clock_firmware PRIVATE "archery_clock_firmware.cpp")
+target_include_directories(archery_clock_firmware PRIVATE "${PROJECT_SOURCE_DIR}")
+add_subdirectory(lib/core)
+add_subdirectory(lib/data)
+add_subdirectory(lib/io)
+add_subdirectory(lib/logging)
+add_subdirectory(lib/message)
+add_subdirectory(lib/mode)
+add_subdirectory(lib/peripheral)
 
 pico_set_program_name(archery_clock_firmware "archery_clock_firmware")
 pico_set_program_version(archery_clock_firmware "0.1")
