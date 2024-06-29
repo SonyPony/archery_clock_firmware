@@ -1,0 +1,1 @@
+target_sources(archery_clock_firmware PRIVATE data_model.h)
