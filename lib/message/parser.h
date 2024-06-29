@@ -56,7 +56,8 @@ void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakCommand *msg);
  * @return Returns a pointer to Command or InitializationCommand or BreakCommand. Commands have to be freed after processing.
  * Or they will cause memory leaks.
  */
-void *parse_message(Buffer *buffer);
+// TODO update doc
+void *parse_message(Buffer *buffer, BreakCommand *break_command, InitializationCommand *init_command, BaseCommand *base_command);
 
 /**
  * @brief parse_message_info Parse the first found valid message info from the message buffer.

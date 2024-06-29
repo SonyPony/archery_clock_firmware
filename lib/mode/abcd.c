@@ -4,14 +4,15 @@
 #include <base.h>
 #include <logging.h>
 
-void abcd_mode_init(AbcdModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data)
+void abcd_mode_init(AbcdModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data)
 {
     if (mode_data == NULL)
-        return NULL;
+        return;
 
     mode_data->base = base_mode_data;
     base_mode_init(
         mode_data->base,
+        round_info,
         init_data,
         (NextStepCallback_t *)&abcd_mode_next_step,
         (HandleSecTickCallback_t *)&abcd_mode_handle_sec_tick,
@@ -20,8 +21,6 @@ void abcd_mode_init(AbcdModeData *mode_data, BaseModeData *base_mode_data, Initi
         (DisplayCallback_t *)&abcd_mode_display,
         (FreeCallback_t *)&abcd_mode_free);
     abcd_mode_reset_state(mode_data, init_data);
-
-    return mode_data;
 }
 
 void abcd_mode_next_step(AbcdModeData *mode_data)
@@ -121,6 +120,7 @@ void abcd_mode_reset_state(AbcdModeData *mode_data, InitializationCommand *init_
     base_mode_reset_state(mode_data->base, init_data);
     mode_data->current_turn = AbTurn;
     mode_data->_current_turn_this_round = 1;
+    mode_data->current_time = mode_data->base->init_data->time_per_round;
 }
 
 void abcd_mode_free(void **mode_data)

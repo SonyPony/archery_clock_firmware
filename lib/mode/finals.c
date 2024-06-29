@@ -4,14 +4,15 @@
 #include <data_model.h>
 #include <logging.h>
 
-void finals_mode_init(FinalsModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data)
+void finals_mode_init(FinalsModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data)
 {
     if (mode_data == NULL)
-        return NULL;
+        return;
 
     mode_data->base = base_mode_data;
     base_mode_init(
         mode_data->base,
+        round_info,
         init_data,
         (NextStepCallback_t *)&finals_mode_next_step,
         (HandleSecTickCallback_t *)&finals_mode_handle_sec_tick,
@@ -20,8 +21,6 @@ void finals_mode_init(FinalsModeData *mode_data, BaseModeData *base_mode_data, I
         (DisplayCallback_t *)&finals_mode_display,
         (FreeCallback_t *)&finals_mode_free);
     finals_mode_reset_state(mode_data, init_data);
-
-    return mode_data;
 }
 
 void finals_mode_next_turn(FinalsModeData *mode_data)
@@ -127,6 +126,8 @@ void finals_mode_reset_state(FinalsModeData *mode_data, InitializationCommand *i
     base_mode_reset_state(mode_data->base, init_data);
     finals_mode_end_round(mode_data);
     mode_data->_reset_time_after_turn = init_data->turn_type == FinalsIndividual_TurnType;
+    mode_data->left_current_time = mode_data->base->init_data->time_per_round;
+        mode_data->right_current_time = mode_data->base->init_data->time_per_round;
 }
 
 void finals_mode_display(DisplayState *display, FinalsModeData *mode_data)

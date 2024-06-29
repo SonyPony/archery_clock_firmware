@@ -18,6 +18,7 @@ typedef struct
     FinalsModeData *_finals_mode_data;
     BaseModeData *base_mode_data;
     InitializationCommand *init_data;
+    RoundInfo *round_info;
 } ModeManager;
 
 void mode_manager_init(
@@ -27,7 +28,8 @@ void mode_manager_init(
     AbcModeData *abc_mode_data,
     AbcdModeData *abcd_mode_data,
     FinalsModeData *finals_mode_data,
-    InitializationCommand *init_data);
+    InitializationCommand *init_data,
+    RoundInfo *round_info);
 
 /**
  * @brief mode_manager_mode_init Initialized given mode based on the intialization data.

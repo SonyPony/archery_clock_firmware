@@ -118,7 +118,7 @@ void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
     *buffer->data_end_idx = (*buffer->data_end_idx) - (msg_info->endIdx + 1);
 }
 
-void *parse_message(Buffer *buffer)
+void *parse_message(Buffer *buffer, BreakCommand *break_command, InitializationCommand *init_command, BaseCommand *base_command)
 {
     if (buffer == NULL)
         return NULL;
@@ -135,7 +135,6 @@ void *parse_message(Buffer *buffer)
     {
         if (break_message_valid(&msg_info))
         {
-            BreakCommand *break_command = (BreakCommand *)malloc(sizeof(BreakCommand));
             if (break_command == NULL)
                 return NULL;
             parse_break_data(buffer, &msg_info, break_command);
@@ -147,7 +146,6 @@ void *parse_message(Buffer *buffer)
     {
         if (initialization_message_valid(&msg_info))
         {
-            InitializationCommand *init_command = (InitializationCommand *)malloc(sizeof(InitializationCommand));
             if (init_command == NULL)
                 return NULL;
             parse_initialization_data(buffer, &msg_info, init_command);
@@ -159,7 +157,6 @@ void *parse_message(Buffer *buffer)
 
     else    // NextStepMessageType, StartMessageType, StopMessageType, PreviousRoundMessageType, NextRoundMessageType, PauseMessageType
     {
-        BaseCommand *base_command = (BaseCommand *)malloc(sizeof(BaseCommand));
         if (base_command == NULL)
             return NULL;
         result = base_command;

@@ -10,9 +10,10 @@ void mode_manager_init(
     AbcModeData *abc_mode_data,
     AbcdModeData *abcd_mode_data,
     FinalsModeData *finals_mode_data,
-    InitializationCommand *init_data)
+    InitializationCommand *init_data,
+    RoundInfo *round_info)
 {
-    if (mode_manager == NULL || base_mode_data == NULL || ab_mode_data == NULL || abc_mode_data == NULL || abcd_mode_data == NULL || finals_mode_data == NULL || init_data == NULL)
+    if (mode_manager == NULL || base_mode_data == NULL || ab_mode_data == NULL || abc_mode_data == NULL || abcd_mode_data == NULL || finals_mode_data == NULL || init_data == NULL || round_info == NULL)
         return;
 
     mode_manager->_ab_mode_data = ab_mode_data;
@@ -22,14 +23,17 @@ void mode_manager_init(
     mode_manager->base_mode_data = base_mode_data;
     mode_manager->mode_data = NULL;
     mode_manager->init_data = init_data;
+    mode_manager->round_info = round_info;
 }
 
 void mode_manager_mode_init(ModeManager *mode_manager, InitializationCommand *init_data)
 {
     if (init_data == NULL || mode_manager == NULL)
         return;
-    if (mode_manager->init_data == NULL)
-        return;
+
+    mode_manager->init_data = init_data;    // TODO check
+    //if (mode_manager->init_data == NULL)
+    //    return;
 
     // copy init data TODO delete
     // memcpy(mode_manager->init_data, init_data, sizeof(InitializationCommand));
@@ -37,26 +41,26 @@ void mode_manager_mode_init(ModeManager *mode_manager, InitializationCommand *in
     switch (init_data->turn_type)
     {
     case AB_TurnType:
-        ab_mode_init(mode_manager->_ab_mode_data, mode_manager->base_mode_data, mode_manager->init_data);
+        ab_mode_init(mode_manager->_ab_mode_data, mode_manager->base_mode_data, mode_manager->round_info, mode_manager->init_data);
         mode_manager->mode_data = mode_manager->_ab_mode_data;
         mode_manager->base_mode_data = ((AbModeData *)(mode_manager->mode_data))->base;
         break;
 
     case ABC_TurnType:
-        abc_mode_init(mode_manager->_abc_mode_data, mode_manager->base_mode_data, mode_manager->init_data);
+        abc_mode_init(mode_manager->_abc_mode_data, mode_manager->base_mode_data, mode_manager->round_info, mode_manager->init_data);
         mode_manager->mode_data = mode_manager->_abc_mode_data;
         mode_manager->base_mode_data = ((AbcModeData *)(mode_manager->mode_data))->base;
         break;
 
     case ABCD_TurnType:
-        abcd_mode_init(mode_manager->_abcd_mode_data, mode_manager->base_mode_data, mode_manager->init_data);
+        abcd_mode_init(mode_manager->_abcd_mode_data, mode_manager->base_mode_data, mode_manager->round_info, mode_manager->init_data);
         mode_manager->mode_data = mode_manager->_abcd_mode_data;
         mode_manager->base_mode_data = ((AbcdModeData *)(mode_manager->mode_data))->base;
         break;
 
     case FinalsIndividual_TurnType:
     case FinalsTeams_TurnType:
-        finals_mode_init(mode_manager->_finals_mode_data, mode_manager->base_mode_data, mode_manager->init_data);
+        finals_mode_init(mode_manager->_finals_mode_data, mode_manager->base_mode_data, mode_manager->round_info, mode_manager->init_data);
         mode_manager->mode_data = mode_manager->_finals_mode_data;
         mode_manager->base_mode_data = ((FinalsModeData *)(mode_manager->mode_data))->base;
         break;

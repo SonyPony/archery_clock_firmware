@@ -6,7 +6,8 @@
 #include <logging.h>
 
 void base_mode_init(
-    BaseModeData *mode,
+    BaseModeData *mode_data,
+    RoundInfo* round_info,
     InitializationCommand *init_data,
     NextStepCallback_t *next_step_func,
     HandleSecTickCallback_t *handle_sec_tic_func,
@@ -16,9 +17,9 @@ void base_mode_init(
     FreeCallback_t *free_func)
 {
     if (mode_data == NULL)
-        return NULL;
+        return;
 
-    mode_data->round_info = (RoundInfo *)malloc(sizeof(RoundInfo));
+    mode_data->round_info = round_info;
     mode_data->next_step = next_step_func;
     mode_data->handle_sec_tic = handle_sec_tic_func;
     mode_data->print = print_func;
@@ -27,8 +28,6 @@ void base_mode_init(
     mode_data->display = display_func;
 
     base_mode_reset_state(mode_data, init_data);
-
-    return mode_data;
 }
 
 void base_mode_reset_state(BaseModeData *mode_data, InitializationCommand *init_data)

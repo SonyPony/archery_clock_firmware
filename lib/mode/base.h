@@ -90,6 +90,7 @@ typedef struct
 
 void base_mode_init(
     BaseModeData *mode_data,
+    RoundInfo* round_info,
     InitializationCommand *init_data,
     NextStepCallback_t *next_step_func,
     HandleSecTickCallback_t *handle_sec_tic_func,

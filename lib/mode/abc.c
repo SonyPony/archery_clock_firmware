@@ -4,14 +4,15 @@
 #include <stdio.h> // TODO delete
 #include <logging.h>
 
-void abc_mode_init(AbcModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data)
+void abc_mode_init(AbcModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data)
 {
     if (mode_data == NULL)
-        return NULL;
+        return;
 
     mode_data->base = base_mode_data;
     base_mode_init(
         mode_data->base,
+        round_info,
         init_data,
         (NextStepCallback_t *)&ab_mode_next_step,
         (HandleSecTickCallback_t *)&ab_mode_handle_sec_tick,
@@ -19,8 +20,6 @@ void abc_mode_init(AbcModeData *mode_data, BaseModeData *base_mode_data, Initial
         (ResetStateCallback_t *)&ab_mode_reset_state,
         (DisplayCallback_t *)&abc_mode_display,
         (FreeCallback_t *)&ab_mode_free);
-
-    return mode_data;
 }
 
 void abc_mode_display(DisplayState *display, AbcModeData *mode_data)

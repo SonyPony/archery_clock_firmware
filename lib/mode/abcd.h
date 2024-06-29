@@ -17,7 +17,7 @@ typedef struct
     BaseModeData *base;
 } AbcdModeData;
 
-void abcd_mode_init(AbcdModeData *mode_data, BaseModeData *base_mode_data, InitializationCommand *init_data);
+void abcd_mode_init(AbcdModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data);
 void abcd_mode_next_step(AbcdModeData *mode_data);
 void abcd_mode_handle_sec_tick(AbcdModeData *mode_data);
 void abcd_mode_print(AbcdModeData *mode_data);
