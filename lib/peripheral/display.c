@@ -1,7 +1,7 @@
 #include "display.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <logging.h>
+#include <lib/logging/logging.h>
 
 uint8_t symbol_to_display_segments(unsigned char symbol)
 {

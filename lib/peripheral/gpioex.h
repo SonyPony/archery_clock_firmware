@@ -1,7 +1,7 @@
 #ifndef _GPIOEX_H_
 #define _GPIOEX_H_
 
-#include <port_linked_pin.h>
+#include <lib/core/port_linked_pin.h>
 
 void GPIOex_Init(PortLinkedPin *pin, GPIO_Mode_TypeDef mode);
 void GPIOex_Write(PortLinkedPin *pin, bool value);

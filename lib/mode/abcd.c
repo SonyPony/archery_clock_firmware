@@ -1,8 +1,8 @@
 #include "abcd.h"
 #include <stdlib.h>
 #include <stdio.h> // TODO delete
-#include <base.h>
-#include <logging.h>
+#include <lib/mode/base.h>
+#include <lib/logging/logging.h>
 
 void abcd_mode_init(AbcdModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data)
 {

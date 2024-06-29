@@ -1,7 +1,7 @@
 #include "ab.h"
 #include <stdio.h> // TODO delete
 #include <stdlib.h>
-#include <logging.h>
+#include <lib/logging/logging.h>
 
 void ab_mode_init(AbModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data)
 {

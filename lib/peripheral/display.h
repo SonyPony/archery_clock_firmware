@@ -2,7 +2,7 @@
 #define _DISPLAY_H_
 
 #include <stdint.h>
-#include <shift_register.h>
+#include <lib/peripheral/shift_register.h>
 
 #define LEFT_DISPLAY_SIZE 3   // 3 symbols
 #define RIGHT_DISPLAY_SIZE 3  // 3 symbols

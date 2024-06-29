@@ -2,8 +2,8 @@
 #define BASE_H
 
 #include <stdbool.h>
-#include <data_model.h>
-#include <display.h>
+#include <lib/data/data_model.h>
+#include <lib/peripheral/display.h>
 
 #define BASE_MODE_HANDLE_NEXT_STEP() { \
     /* prep time can't be skipped */ \

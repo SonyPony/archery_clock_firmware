@@ -1,9 +1,9 @@
 #include "base.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <display.h>
-#include <data_model.h>
-#include <logging.h>
+#include <lib/peripheral/display.h>
+#include <lib/data/data_model.h>
+#include <lib/logging/logging.h>
 
 void base_mode_init(
     BaseModeData *mode_data,

@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 #include "message_info.h"
-#include <buffer.h>
-#include <data_model.h>
+#include <lib/core/buffer.h>
+#include <lib/data/data_model.h>
 
 #define MESSAGE_START_SYMBOL '<'
 #define MESSAGE_END_SYMBOL '>'

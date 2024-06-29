@@ -2,7 +2,7 @@
 #define _UART_H_
 
 #include <stdint.h>
-#include <buffer.h>
+#include <lib/core/buffer.h>
 
 /**
  * @brief uart_init The function initializes TX and RX for given UART channel with

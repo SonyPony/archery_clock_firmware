@@ -1,7 +1,7 @@
 #ifndef DATA_MODEL_H
 #define DATA_MODEL_H
 
-#include <message_info.h>
+#include <lib/message/message_info.h>
 
 #define PREP_TIME 10    // in seconds
 

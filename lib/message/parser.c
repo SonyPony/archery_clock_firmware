@@ -1,8 +1,8 @@
 #include "parser.h"
-#include <core.h>
+#include <lib/core/core.h>
 #include <string.h>
 #include <stdlib.h>
-#include <data_model.h>
+#include <lib/core/buffer.h>
 
 bool message_info_valid(MessageInfo *msg_info)
 {

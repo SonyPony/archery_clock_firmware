@@ -1,8 +1,8 @@
 #include "finals.h"
 #include <stdlib.h>
 #include <stdio.h> // TODO delete
-#include <data_model.h>
-#include <logging.h>
+#include <lib/data/data_model.h>
+#include <lib/logging/logging.h>
 
 void finals_mode_init(FinalsModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data)
 {

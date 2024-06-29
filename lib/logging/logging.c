@@ -1,7 +1,7 @@
 #include "logging.h"
 #include <stdarg.h>
 #include <stdio.h>
-#include <uart.h>
+#include "lib/io/uart.h"
 #include <string.h>
 
 uint8_t print_buffer[512];

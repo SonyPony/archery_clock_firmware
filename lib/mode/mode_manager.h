@@ -1,13 +1,12 @@
 #ifndef _MODE_MANAGER_H_
 #define _MODE_MANAGER_H_
 
-#include <base.h>
-#include <buffer.h>
-#include <data_model.h>
-#include <finals.h>
-#include <ab.h>
-#include <abc.h>
-#include <abcd.h>
+#include <lib/core/buffer.h>
+#include <lib/data/data_model.h>
+#include <lib/mode/finals.h>
+#include <lib/mode/ab.h>
+#include <lib/mode/abc.h>
+#include <lib/mode/abcd.h>
 
 typedef struct
 {

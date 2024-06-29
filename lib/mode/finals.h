@@ -2,8 +2,8 @@
 #define FINALS_H
 
 #include <stdbool.h>
-#include <data_model.h>
-#include "base.h"
+#include <lib/data/data_model.h>
+#include <lib/mode/base.h>
 
 typedef enum
 {

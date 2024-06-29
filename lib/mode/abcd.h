@@ -1,7 +1,7 @@
 #ifndef ABCD_H
 #define ABCD_H
 
-#include "base.h"
+#include <lib/mode/base.h>
 
 typedef enum
 {

@@ -2,7 +2,7 @@
 #define ABC_H
 
 #include "base.h"
-#include <data_model.h>
+#include <lib/data/data_model.h>
 #include "ab.h"
 
 typedef AbModeData AbcModeData;
