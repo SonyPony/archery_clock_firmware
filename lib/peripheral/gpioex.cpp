@@ -3,7 +3,7 @@
 void GPIOex_Init(uint32_t pin, enum GPIOMode mode)
 {
     gpio_init(pin);
-    gpio_set_dir(pin, (uint32_t)mode);
+    gpio_set_dir(pin, static_cast<decltype(GPIO_OUT)>(mode));
 }
 
 void GPIOex_Write(uint32_t pin, bool value)
