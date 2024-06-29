@@ -1,7 +1,7 @@
 #ifndef MESSAGE_INFO_H
 #define MESSAGE_INFO_H
 
-typedef enum
+enum MessageType
 {
     InitializationMessageType = 0,
     StartMessageType = 1,
@@ -14,12 +14,12 @@ typedef enum
     StateMessageType = 'a',
     RoundChangeMessageType = 'b',
     InvalidMessageType = 255,
-} MessageType;
+};
 
-typedef struct
+struct MessageInfo
 {
     int startIdx; // points to the start index in message buffer
     int endIdx;   // points to the end index in message buffer
-} MessageInfo;
+} ;
 
 #endif // MESSAGE_INFO_H

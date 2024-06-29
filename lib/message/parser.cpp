@@ -10,7 +10,7 @@ bool message_info_valid(MessageInfo *msg_info)
     if (msg_info == NULL)
         return false;
 
-    return msg_info->startIdx != -1 && msg_info->endIdx != -1 && msg_info->startIdx < msg_info->endIdx;
+    return msg_info->startIdx != -1 && msg_info->endIdx != -1;
 }
 
 bool break_message_valid(MessageInfo *msg_info, Buffer* buffer)
@@ -104,7 +104,9 @@ MessageType parse_message_type(MessageInfo *msg_info, Buffer *buffer)
     const uint8_t raw_type = buffer->byte(relativeIdxMsgStart); 
     if (raw_type >= '0' && raw_type <= '7')
         return static_cast<MessageType>(raw_type - '0');
-    return static_cast<MessageType>(raw_type);
+    else if (raw_type >= 'a' && raw_type <= 'b')
+        return static_cast<MessageType>(raw_type);
+    return InvalidMessageType;
 }
 
 void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
@@ -115,9 +117,9 @@ void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
     if (!message_info_valid(msg_info))
         return;
 
-    buffer->invalidateBytes(buffer->bytesCount(msg_info->startIdx, msg_info->endIdx));
-    //memmove(buffer->data, buffer->data + msg_info->endIdx + 1, buffer->size - msg_info->endIdx - 1);
-    //*buffer->data_end_idx = (*buffer->data_end_idx) - (msg_info->endIdx + 1);
+    const uint32_t invalidBytes = (buffer->bytesCount(buffer->data_start_idx, msg_info->startIdx));
+    const uint32_t messageSize = buffer->bytesCount(msg_info->startIdx, msg_info->endIdx + 1);      // needs to point on the edge of message (next element after message)
+    buffer->invalidateBytes(messageSize + invalidBytes);
 }
 
 void *parse_message(Buffer *buffer, BreakCommand *break_command, InitializationCommand *init_command, BaseCommand *base_command)

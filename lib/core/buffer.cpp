@@ -41,15 +41,16 @@ uint32_t Buffer::currentSize() const {
 }
 
 void Buffer::addByte(char byte) {
-    this->data[(*this->data_end_idx)++] = byte;
+    this->data[*this->data_end_idx] = byte;
+    *this->data_end_idx = (*this->data_end_idx + 1) % this->size;
 }
 
 void Buffer::invalidateBytes(uint32_t bytesCount) {
-    this->data_start_idx += bytesCount;
+    this->data_start_idx = (this->data_start_idx + bytesCount) % this->size;
 }
 
 uint32_t Buffer::bytesCount(uint32_t startIdx, uint32_t endIdx) const {
-    const uint32_t occupiedBytes = endIdx - startIdx;
+    const int occupiedBytes = static_cast<int>(endIdx) - static_cast<int>(startIdx);
     if(occupiedBytes < 0)    // handle edge case, when the end index is smaller than start index
         return this->size + occupiedBytes;
     return occupiedBytes;

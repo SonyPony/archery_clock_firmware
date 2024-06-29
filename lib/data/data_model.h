@@ -5,18 +5,22 @@
 
 #define PREP_TIME 10    // in seconds
 
-typedef enum
+enum TurnType
 {
     AB_TurnType,
     ABC_TurnType,
     ABCD_TurnType,
     FinalsTeams_TurnType,
     FinalsIndividual_TurnType,
-} TurnType;
+};
 
-struct InitializationCommand
+struct BaseCommand
 {
     MessageType type;
+};
+
+struct InitializationCommand: public BaseCommand
+{
     int time_per_round;
     int warning_time;
     int training_rounds_count;
@@ -25,15 +29,9 @@ struct InitializationCommand
     int turns_per_round; // A -> B -> A -> B -> ROUND 2 -> 2 turns per round;
 };
 
-struct BreakCommand
+struct BreakCommand: public BaseCommand
 {
-    MessageType type;
     int break_time;
-};
-
-struct BaseCommand
-{
-    MessageType type;
 };
 
 #endif // RUN_DATA_H
