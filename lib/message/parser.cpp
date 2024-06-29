@@ -1,9 +1,7 @@
 #include "parser.h"
-#include <lib/core/core.h>
 #include <string.h>
 #include <stdlib.h>
 #include <lib/core/buffer.h>
-#include <lib/core/core.h>
 
 bool message_info_valid(MessageInfo *msg_info)
 {
@@ -117,7 +115,7 @@ void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
     if (!message_info_valid(msg_info))
         return;
 
-    const uint32_t invalidBytes = (buffer->bytesCount(buffer->data_start_idx, msg_info->startIdx));
+    const uint32_t invalidBytes = (buffer->bytesCount(buffer->dataStartIdx(), msg_info->startIdx));
     const uint32_t messageSize = buffer->bytesCount(msg_info->startIdx, msg_info->endIdx + 1);      // needs to point on the edge of message (next element after message)
     buffer->invalidateBytes(messageSize + invalidBytes);
 }

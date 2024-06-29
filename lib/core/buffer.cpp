@@ -3,56 +3,60 @@
 #include <stdlib.h>
 
 Buffer::Buffer(volatile char* dataBuffer, volatile uint32_t* endPointer, int bufferSize) {
-    this->data = dataBuffer;
-    this->size = bufferSize;
-    this->data_end_idx = endPointer;
+    this->m_data = dataBuffer;
+    this->m_capacity = bufferSize;
+    this->m_dataEndIdx = endPointer;
 
     this->clear();
 }
 
 void Buffer::clear()
 {
-    if (this->data == nullptr)
+    if (this->m_data == nullptr)
         return;
 
-    for (int i = 0; i < this->size; i++)
-        this->data[i] = 0;
-    *this->data_end_idx = 0;
-    this->data_start_idx = 0;
+    for (int i = 0; i < this->m_capacity; i++)
+        this->m_data[i] = 0;
+    *this->m_dataEndIdx = 0;
+    this->m_dataStartIdx = 0;
 }
 
 uint32_t Buffer::realIdx(uint32_t relativeIdx) const {
-    return (this->data_start_idx + relativeIdx) % this->size;
+    return (this->m_dataStartIdx + relativeIdx) % this->m_capacity;
 }
 
 uint32_t Buffer::relativeIdx(uint32_t realIdx) const {
-    return this->bytesCount(this->data_start_idx, realIdx);
+    return this->bytesCount(this->m_dataStartIdx, realIdx);
 }
 
 char Buffer::byte(uint32_t relativeIdx) const {
-    if(this->data == nullptr)
+    if(this->m_data == nullptr)
         return 0;
 
-    return this->data[this->realIdx(relativeIdx)];
+    return this->m_data[this->realIdx(relativeIdx)];
 }
 
 uint32_t Buffer::currentSize() const {
-    return this->bytesCount(this->data_start_idx, *this->data_end_idx);
+    return this->bytesCount(this->m_dataStartIdx, *this->m_dataEndIdx);
+}
+
+uint32_t Buffer::dataStartIdx() const {
+    return this->m_dataStartIdx;
 }
 
 void Buffer::addByte(char byte) {
-    this->data[*this->data_end_idx] = byte;
-    *this->data_end_idx = (*this->data_end_idx + 1) % this->size;
+    this->m_data[*this->m_dataEndIdx] = byte;
+    *this->m_dataEndIdx = (*this->m_dataEndIdx + 1) % this->m_capacity;
 }
 
 void Buffer::invalidateBytes(uint32_t bytesCount) {
-    this->data_start_idx = (this->data_start_idx + bytesCount) % this->size;
+    this->m_dataStartIdx = (this->m_dataStartIdx + bytesCount) % this->m_capacity;
 }
 
 uint32_t Buffer::bytesCount(uint32_t startIdx, uint32_t endIdx) const {
     const int occupiedBytes = static_cast<int>(endIdx) - static_cast<int>(startIdx);
     if(occupiedBytes < 0)    // handle edge case, when the end index is smaller than start index
-        return this->size + occupiedBytes;
+        return this->m_capacity + occupiedBytes;
     return occupiedBytes;
 }
 

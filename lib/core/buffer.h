@@ -2,15 +2,17 @@
 #define BUFFER_H
 
 #include <stdint.h>
+#include <cstdint>
 
 class Buffer
 {
-    public:
-        volatile char *data;
-        volatile uint32_t* data_end_idx;    // points to the element after the last byte
-        uint32_t data_start_idx;
-        int size;
+    private: 
+        volatile char *m_data;
+        volatile uint32_t* m_dataEndIdx;    // points to the element after the last byte
+        uint32_t m_dataStartIdx;
+        int m_capacity;
 
+    public:
         Buffer(volatile char* dataBuffer, volatile uint32_t* endPointer, int bufferSize);
 
         /**
@@ -30,6 +32,7 @@ class Buffer
         uint32_t realIdx(uint32_t relativeIdx) const;
 
         uint32_t relativeIdx(uint32_t realIdx) const;
+        uint32_t dataStartIdx() const;
 
         // TODO doc
         uint32_t currentSize() const;
