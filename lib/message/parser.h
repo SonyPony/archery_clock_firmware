@@ -1,7 +1,6 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <stdbool.h>
 #include "message_info.h"
 #include <lib/core/buffer.h>
 #include <lib/data/data_model.h>
@@ -19,10 +18,11 @@ bool message_info_valid(MessageInfo *msg_info);
 
 /**
  * @brief break_message_valid Controls whether the size of break message is correct.
- * @param msg_info Controlled message info.
+ * @param msg_info Controlled message info.K
  * @return Returns true if the message has correct size, otherwise it returns false.
  */
-bool break_message_valid(MessageInfo *msg_info);
+// TODO update doc
+bool break_message_valid(MessageInfo *msg_info, Buffer* buffer);
 
 /**
  * @brief initialization_message_valid Controls whether the size of initialization
@@ -30,6 +30,7 @@ bool break_message_valid(MessageInfo *msg_info);
  * @param msg_info Controlled message info.
  * @return Returns true if the message has correct size, otherwise it returns false.
  */
+// TODO update doc
 bool initialization_message_valid(MessageInfo *msg_info);
 
 /**

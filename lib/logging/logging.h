@@ -5,6 +5,8 @@
 
 #define PC_UART_CHANNEL 1
 
-void log(const char *format, ...);
+namespace Logging {
+    void log(const char *format, ...);
+}
 
 #endif

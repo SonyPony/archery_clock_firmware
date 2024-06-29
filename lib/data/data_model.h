@@ -14,7 +14,7 @@ typedef enum
     FinalsIndividual_TurnType,
 } TurnType;
 
-typedef struct
+struct InitializationCommand
 {
     MessageType type;
     int time_per_round;
@@ -23,17 +23,17 @@ typedef struct
     TurnType turn_type;
     int prep_time;
     int turns_per_round; // A -> B -> A -> B -> ROUND 2 -> 2 turns per round;
-} InitializationCommand;
+};
 
-typedef struct
+struct BreakCommand
 {
     MessageType type;
     int break_time;
-} BreakCommand;
+};
 
-typedef struct
+struct BaseCommand
 {
     MessageType type;
-} BaseCommand;
+};
 
 #endif // RUN_DATA_H

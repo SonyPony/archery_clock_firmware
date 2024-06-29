@@ -1,20 +1,23 @@
 #include "shift_register.h"
 #include <stdlib.h>
-#include <gpioex.h>
-#include <delay.h>
+#include <lib/peripheral/gpioex.h>
 
-void sr_init(ShiftRegister *sr, PortLinkedPin *clk_pin, PortLinkedPin *data_pin, PortLinkedPin *cs_pin)
+void sr_init(ShiftRegister *sr, uint32_t clk_pin, uint32_t data_pin, uint32_t cs_pin)
 {
-    if (sr == NULL || clk_pin == NULL || data_pin == NULL || cs_pin == NULL)
+    if (sr == NULL)
         return;
 
     sr->clk_pin = clk_pin;
     sr->cs_pin = cs_pin;
     sr->data_pin = data_pin;
 
-    GPIOex_Init(clk_pin, GPIO_MODE_OUT_PP_LOW_SLOW);
-    GPIOex_Init(data_pin, GPIO_MODE_OUT_PP_LOW_SLOW);
-    GPIOex_Init(cs_pin, GPIO_MODE_OUT_PP_HIGH_SLOW);
+    gpio_init(clk_pin);
+    gpio_init(data_pin);
+    gpio_init(cs_pin);
+
+    gpio_set_dir(clk_pin, GPIO_OUT);
+    gpio_set_dir(data_pin, GPIO_OUT);
+    gpio_set_dir(cs_pin, GPIO_OUT);
 }
 
 void sr_set_data(ShiftRegister *sr, uint8_t data)
@@ -28,7 +31,7 @@ void sr_set_data(ShiftRegister *sr, uint8_t data)
         for (uint8_t i = 0; i < 2; i++)                         // send clock pulse
         {
             GPIOex_WriteReverse(sr->clk_pin); // the SR will react on rising edge of clock
-            _delay_us(1);
+            _delay_us(1);   // TODO delay
         }
     }
 }

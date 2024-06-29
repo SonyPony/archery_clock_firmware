@@ -171,7 +171,7 @@ void round_info_init(RoundInfo *round_info, int training_rounds_count)
     round_info->training = (training_rounds_count > 0);
 }
 
-void base_mode_round_display(BaseModeData *mode_data, unsigned char *target)
+void base_mode_round_display(BaseModeData *mode_data, char *target)
 {
     if (mode_data == NULL || target == NULL)
         return;

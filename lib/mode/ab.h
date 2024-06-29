@@ -4,11 +4,11 @@
 #include "base.h"
 #include <lib/data/data_model.h>
 
-typedef struct
+struct AbModeData
 {
     int current_time;
     BaseModeData *base;
-} AbModeData;
+};
 
 void ab_mode_init(AbModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data);
 void ab_mode_next_step(AbModeData *mode_data);

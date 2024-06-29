@@ -1,7 +1,6 @@
 #ifndef BASE_H
 #define BASE_H
 
-#include <stdbool.h>
 #include <lib/data/data_model.h>
 #include <lib/peripheral/display.h>
 
@@ -120,7 +119,7 @@ bool base_mode_prep_time(BaseModeData *mode_data);
 bool base_mode_in_warning_time(BaseModeData *mode_data);
 void base_mode_prev_round(BaseModeData *mode_data);
 void base_mode_next_round(BaseModeData *mode_data);
-void base_mode_round_display(BaseModeData *mode_data, unsigned char *target);
+void base_mode_round_display(BaseModeData *mode_data, char *target);
 void base_mode_display_semaphor(DisplayState *display, BaseModeData *mode_data);
 void base_mode_free(void **mode_data);
 void base_mode_free_internal(BaseModeData **mode_data);

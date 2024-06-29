@@ -25,7 +25,7 @@ void uart_send_byte(uint8_t uart_idx, uint8_t data);
  * @param uart_idx Target UART channel.
  * @param data String that will be sent. The string will has to end with null character.
  */
-void uart_send(uint8_t uart_idx, uint8_t *data);
+void uart_send(uint8_t uart_idx, char *data);
 
 /**
  * @brief uart_read_byte Reads byte from read buffer. It doesn't contain waiting for read ready flag.

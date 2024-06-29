@@ -4,8 +4,8 @@
 #include "lib/io/uart.h"
 #include <string.h>
 
-uint8_t print_buffer[512];
-void log(const char *format, ...)
+char print_buffer[512];
+void Logging::log(const char *format, ...)
 {
     memset(print_buffer, 0, 512);
 

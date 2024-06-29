@@ -31,7 +31,7 @@ void uart_send_byte(uint8_t uart_idx, uint8_t data)
         UART1_SendData8(data);*/
 }
 
-void uart_send(uint8_t uart_idx, uint8_t *data)
+void uart_send(uint8_t uart_idx, char *data)
 {
     /*for (int i = 0; data[i]; i++)
         uart_send_byte(uart_idx, data[i]);*/

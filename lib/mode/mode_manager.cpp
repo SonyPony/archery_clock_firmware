@@ -1,6 +1,6 @@
-#include <mode_manager.h>
+#include "mode_manager.h"
 #include <stdlib.h>
-#include <parser.h>
+#include <lib/message/parser.h>
 #include <string.h>
 
 void mode_manager_init(

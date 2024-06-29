@@ -5,7 +5,6 @@
 #include <stm8s_itc.h>
 #include <stm8s_clk.h>
 #include <milis.h>
-#include <port_linked_pin.h>
 #include <gpioex.h>
 #include <buffer.h>
 #include <shift_register.h>
@@ -121,14 +120,14 @@ int main(void)
       //command = parse_message(&message_buffer, &break_command, &init_command, &base_command);
       //enableInterrupts();
 
-      // log("%06d: Buffer: %s\n\r", i, message_buffer.data);
+      // Logging::log("%06d: Buffer: %s\n\r", i, message_buffer.data);
       //last_time = milis();
       //GPIOex_WriteReverse(&led_pin);
       GPIO_WriteReverse(GPIOC, GPIO_PIN_5);
       //disableInterrupts();
       //uart_send(PC_UART_CHANNEL, "ahoj\r\n");
       {
-      log("%06d: Buffer: \n\r", i);
+      Logging::log("%06d: Buffer: \n\r", i);
       }
       //enableInterrupts();
       i++;
@@ -141,9 +140,9 @@ int main(void)
 
         //- LOGGING -----------------------------------------
 
-        log("%6d: ", i);
+        Logging::log("%6d: ", i);
         display_state_print(&display_state);
-        log(",  ");
+        Logging::log(",  ");
         mode_manager.base_mode_data->print(mode_manager.mode_data);
         //---------------------------------------------------
 
@@ -153,7 +152,7 @@ int main(void)
       // handle commands
       if (command != NULL)
       {
-        log("dooo\n\r");
+        Logging::log("dooo\n\r");
         mode_manager_process_commands(&mode_manager, command);
 
         // free command memory, cleanups
@@ -171,7 +170,7 @@ INTERRUPT_HANDLER(UART1_RX_IRQHandler, 18)
   /*disableInterrupts();
   uart_read(PC_UART_CHANNEL, &message_buffer);
   enableInterrupts();*/
-  // log("%06d: Buffer: %s\n\r", 0, message_buffer.data);
+  // Logging::log("%06d: Buffer: %s\n\r", 0, message_buffer.data);
 }
 
 INTERRUPT_HANDLER(UART3_RX_IRQHandler, 21)

@@ -18,9 +18,9 @@ typedef enum
 
 typedef struct
 {
-    unsigned char left_display[LEFT_DISPLAY_SIZE + 1]; // add 1 for null symbol
-    unsigned char right_display[RIGHT_DISPLAY_SIZE + 1];
-    unsigned char middle_display[MIDDLE_DISPLAY_SIZE + 1];
+    char left_display[LEFT_DISPLAY_SIZE + 1]; // add 1 for null symbol
+    char right_display[RIGHT_DISPLAY_SIZE + 1];
+    char middle_display[MIDDLE_DISPLAY_SIZE + 1];
     SemaphorDisplayState semaphor_display;
 } DisplayState;
 
