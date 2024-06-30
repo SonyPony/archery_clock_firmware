@@ -45,14 +45,24 @@
     } \
 }
 
-typedef struct
+class RoundInfo
 {
-    int current_round;
-    bool training;
-    int _training_rounds_count;
-} RoundInfo;
+    private:
+        int m_trainingRoundsCount;
+        int m_currentRound;
+        bool m_isTraining;
 
-void round_info_init(RoundInfo *round_info, int training_rounds_count);
+    public:
+        RoundInfo(int trainingRoundsCount);
+
+        bool isTraining() const;
+        int currentRound() const;
+        bool isFirstCompetitionRound() const;
+
+        void setPreviousRound();
+        void setNextRound();
+};
+
 void round_info_prev_round(RoundInfo *round_info);
 void round_info_next_round(RoundInfo *round_info);
 bool round_info_first_competition_round(RoundInfo *round_info);
@@ -72,7 +82,7 @@ typedef struct
     bool paused;
     bool is_break;
 
-    RoundInfo *round_info;
+    RoundInfo m_roundInfo;
 
     // timers
     int _break_timer;
@@ -89,7 +99,6 @@ typedef struct
 
 void base_mode_init(
     BaseModeData *mode_data,
-    RoundInfo* round_info,
     InitializationCommand *init_data,
     NextStepCallback_t *next_step_func,
     HandleSecTickCallback_t *handle_sec_tic_func,

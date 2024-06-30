@@ -5,6 +5,51 @@
 #include <lib/data/data_model.h>
 #include <lib/logging/logging.h>
 
+
+RoundInfo::RoundInfo(int trainingRoundsCount)
+{
+    this->m_trainingRoundsCount = trainingRoundsCount;
+    this->m_currentRound = 1;
+    this->m_isTraining = (trainingRoundsCount > 0);
+}
+
+bool RoundInfo::isFirstCompetitionRound() const 
+{
+    return this->m_currentRound == 1 && !this->m_isTraining;
+}
+
+void RoundInfo::setPreviousRound()
+{
+    this->m_currentRound--; // decrese the current round
+
+    // switch back to training rounds
+    if (!this->m_isTraining && this->m_currentRound <= 0)
+    {
+        this->m_currentRound = this->m_trainingRoundsCount;
+        this->m_isTraining = true;
+    }
+
+    // handle underflow of training rounds
+    if (this->m_isTraining && this->m_currentRound <= 0)
+        this->m_currentRound = 1;
+}
+
+void RoundInfo::setNextRound()
+{
+    this->m_currentRound++; // increase current round
+
+    // end of training rounds
+    if (this->m_isTraining && this->m_currentRound > this->m_trainingRoundsCount)
+    {
+        this->m_currentRound = 1;
+        this->m_isTraining = false;
+    }
+
+    // handle maximum number of rounds (99)
+    if (this->m_currentRound > 99)
+        this->m_currentRound = 99;
+}
+
 void base_mode_init(
     BaseModeData *mode_data,
     RoundInfo* round_info,
@@ -107,44 +152,6 @@ bool base_mode_in_warning_time(BaseModeData *mode_data)
     return false;
 }
 
-void round_info_prev_round(RoundInfo *round_info)
-{
-    if (round_info == NULL)
-        return;
-
-    round_info->current_round--; // decrese the current round
-
-    // switch back to training rounds
-    if (!round_info->training && round_info->current_round <= 0)
-    {
-        round_info->current_round = round_info->_training_rounds_count;
-        round_info->training = true;
-    }
-
-    // handle underflow of training rounds
-    if (round_info->training && round_info->current_round <= 0)
-        round_info->current_round = 1;
-}
-
-void round_info_next_round(RoundInfo *round_info)
-{
-    if (round_info == NULL)
-        return;
-
-    round_info->current_round++; // increase current round
-
-    // end of training rounds
-    if (round_info->training && round_info->current_round > round_info->_training_rounds_count)
-    {
-        round_info->current_round = 1;
-        round_info->training = false;
-    }
-
-    // handle maximum number of rounds (99)
-    if (round_info->current_round > 99)
-        round_info->current_round = 99;
-}
-
 void base_mode_next_round(BaseModeData *mode_data)
 {
     if (mode_data == NULL)
@@ -159,16 +166,6 @@ void base_mode_prev_round(BaseModeData *mode_data)
         return;
 
     round_info_prev_round(mode_data->round_info);
-}
-
-void round_info_init(RoundInfo *round_info, int training_rounds_count)
-{
-    if (round_info == NULL)
-        return;
-
-    round_info->_training_rounds_count = training_rounds_count;
-    round_info->current_round = 1;
-    round_info->training = (training_rounds_count > 0);
 }
 
 void base_mode_round_display(BaseModeData *mode_data, char *target)
@@ -194,13 +191,6 @@ void base_mode_free(void **mode_data)
         return;
     free(*mode_data);
     *mode_data = NULL;
-}
-
-bool round_info_first_competition_round(RoundInfo *round_info)
-{
-    if (round_info == NULL)
-        return false;
-    return round_info->current_round == 1 && !round_info->training;
 }
 
 bool base_mode_current_timer_is_prep(BaseModeData *mode_data)
