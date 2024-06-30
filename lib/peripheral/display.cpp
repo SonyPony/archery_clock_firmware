@@ -3,7 +3,61 @@
 #include <stdio.h>
 #include <lib/logging/logging.h>
 
-uint8_t symbol_to_display_segments(unsigned char symbol)
+
+void DisplayState::clear()
+{
+    sprintf(this->leftDisplay, "%s", "   ");
+    sprintf(this->rightDisplay, "%s", "   ");
+    sprintf(this->middleDisplay, "%s", "  ");
+    this->semaphorDisplay = SemaphorDisplayEmpty;
+}
+
+void DisplayState::log() const
+{
+    char semaphor = '/';
+    if (this->semaphorDisplay == SemaphorDisplayOrange)
+        semaphor = 'O';
+    else if (this->semaphorDisplay == SemaphorDisplayRed)
+        semaphor = 'R';
+    else if (this->semaphorDisplay == SemaphorDisplayGreen)
+        semaphor = 'G';
+
+    Logging::log(
+        "Display(left: \"%s\", middle: \"%s\", right: \"%s\", semaphor: \"%c\")",
+        this->leftDisplay,
+        this->middleDisplay,
+        this->rightDisplay,
+        semaphor);
+}
+
+DisplayController::DisplayController(ShiftRegister *shiftRegister)
+{
+    this->m_shift_register = shiftRegister;
+    this->m_displayState.clear();
+}
+
+DisplayState *DisplayController::displayState()
+{
+    return &this->m_displayState;
+}
+
+void DisplayController::display()
+{
+    for (int i = 0; i < LEFT_DISPLAY_SIZE; i++)
+        this->m_shift_register->setData(DisplayController::symbolToDisplayData(m_displayState.leftDisplay[i]));
+
+    this->m_shift_register->setData(DisplayController::semaphorToDisplayData(m_displayState.semaphorDisplay));
+
+    for (int i = 0; i < MIDDLE_DISPLAY_SIZE; i++)
+        this->m_shift_register->setData(DisplayController::symbolToDisplayData(m_displayState.middleDisplay[i]));
+
+    for (int i = 0; i < RIGHT_DISPLAY_SIZE; i++)
+        this->m_shift_register->setData(DisplayController::symbolToDisplayData(m_displayState.rightDisplay[i]));
+
+    this->m_shift_register->confirm();
+}
+
+uint8_t DisplayController::symbolToDisplayData(uint8_t symbol)
 {
     /**
      *      0
@@ -54,70 +108,14 @@ uint8_t symbol_to_display_segments(unsigned char symbol)
     }
 }
 
-uint8_t semaphor_to_display_data(SemaphorDisplayState semaphor_state)
+uint8_t DisplayController::semaphorToDisplayData(SemaphorDisplayState semaphorState)
 {
-    if (semaphor_state == SemaphorDisplayOrange)
+    if (semaphorState == SemaphorDisplayOrange)
         return 0b00000010;
-    else if (semaphor_state == SemaphorDisplayRed)
+    else if (semaphorState == SemaphorDisplayRed)
         return 0b00000100;
-    else if (semaphor_state == SemaphorDisplayGreen)
+    else if (semaphorState == SemaphorDisplayGreen)
         return 0b00000001;
     else // empty/clear
         return 0b00000000;
-}
-
-void display_state_clear(DisplayState *display_state)
-{
-    if (display_state == NULL)
-        return;
-
-    sprintf(display_state->left_display, "%s", "   ");
-    sprintf(display_state->right_display, "%s", "   ");
-    sprintf(display_state->middle_display, "%s", "  ");
-    display_state->semaphor_display = SemaphorDisplayEmpty;
-}
-
-void display_controller_init(DisplayController *display, ShiftRegister *sr)
-{
-    if (display == NULL)
-        return;
-
-    display->shift_register = sr;
-}
-
-void display_controller_display(DisplayController *display, DisplayState *state)
-{
-    for (int i = 0; i < LEFT_DISPLAY_SIZE; i++)
-        display->shift_register->setData(symbol_to_display_segments(state->left_display[i]));
-    // TODO semaphor
-    display->shift_register->setData(semaphor_to_display_data(state->semaphor_display));
-
-    for (int i = 0; i < MIDDLE_DISPLAY_SIZE; i++)
-        display->shift_register->setData(symbol_to_display_segments(state->middle_display[i]));
-
-    for (int i = 0; i < RIGHT_DISPLAY_SIZE; i++)
-        display->shift_register->setData(symbol_to_display_segments(state->right_display[i]));
-
-    display->shift_register->confirm();
-}
-
-void display_state_print(DisplayState *display_state)
-{
-    if (display_state == NULL)
-        return;
-
-    char semaphor = '/';
-    if (display_state->semaphor_display == SemaphorDisplayOrange)
-        semaphor = 'O';
-    else if (display_state->semaphor_display == SemaphorDisplayRed)
-        semaphor = 'R';
-    else if (display_state->semaphor_display == SemaphorDisplayGreen)
-        semaphor = 'G';
-
-    Logging::log(
-        "Display(left: \"%s\", middle: \"%s\", right: \"%s\", semaphor: \"%c\")",
-        display_state->left_display,
-        display_state->middle_display,
-        display_state->right_display,
-        semaphor);
 }

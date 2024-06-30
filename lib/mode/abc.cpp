@@ -32,7 +32,7 @@ void abc_mode_display(DisplayState *display, AbcModeData *mode_data)
     ab_mode_display(display, mode_data);
 
     // set turn (overwrite)
-    sprintf(display->right_display, "%s", "ABC");
+    sprintf(display->rightDisplay, "%s", "ABC");
 }
 
 void abc_mode_print(AbcModeData *mode_data)

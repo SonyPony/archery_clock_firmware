@@ -75,12 +75,12 @@ void ab_mode_display(DisplayState *display, AbModeData *mode_data)
     BASE_MODE_DISPLAY();
 
     // set time
-    sprintf(display->left_display, "%3d", base_mode_current_time(mode_data->base));
+    sprintf(display->leftDisplay, "%3d", base_mode_current_time(mode_data->base));
     // set turn
-    sprintf(display->right_display, "%s", "AB ");
+    sprintf(display->rightDisplay, "%s", "AB ");
 
     base_mode_display_semaphor(display, mode_data->base);
-    base_mode_round_display(mode_data->base, display->middle_display);
+    base_mode_round_display(mode_data->base, display->middleDisplay);
 }
 
 void ab_mode_reset_state(AbModeData *mode_data, InitializationCommand *init_data)

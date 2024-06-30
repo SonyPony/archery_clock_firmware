@@ -217,11 +217,11 @@ void base_mode_display_semaphor(DisplayState *display, BaseModeData *mode_data)
 
     // set sempahor color
     if (base_mode_prep_time(mode_data))
-        display->semaphor_display = SemaphorDisplayRed;
+        display->semaphorDisplay = SemaphorDisplayRed;
     else if (base_mode_in_warning_time(mode_data))
-        display->semaphor_display = SemaphorDisplayOrange;
+        display->semaphorDisplay = SemaphorDisplayOrange;
     else
-        display->semaphor_display = SemaphorDisplayGreen;
+        display->semaphorDisplay = SemaphorDisplayGreen;
 }
 
 void base_mode_free_internal(BaseModeData **mode_data)
@@ -270,10 +270,10 @@ void base_mode_display_break(DisplayState *display, BaseModeData *mode_data)
     const int current_time = mode_data->_break_timer;
     const int minutes = current_time / 60;
     const int seconds = current_time % 60;
-    display->semaphor_display = (current_time % 2) ? SemaphorDisplayOrange : SemaphorDisplayEmpty;
+    display->semaphorDisplay = (current_time % 2) ? SemaphorDisplayOrange : SemaphorDisplayEmpty;
     
-    sprintf(display->middle_display, "%s", "--");
-    sprintf(display->left_display, "%3d", minutes);
-    sprintf(display->right_display, "%3d", seconds);
+    sprintf(display->middleDisplay, "%s", "--");
+    sprintf(display->leftDisplay, "%3d", minutes);
+    sprintf(display->rightDisplay, "%3d", seconds);
 
 }

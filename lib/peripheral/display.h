@@ -8,47 +8,52 @@
 #define RIGHT_DISPLAY_SIZE 3  // 3 symbols
 #define MIDDLE_DISPLAY_SIZE 2 // 2 symbols
 
-typedef enum
+enum SemaphorDisplayState
 {
     SemaphorDisplayRed,
     SemaphorDisplayOrange,
     SemaphorDisplayGreen,
     SemaphorDisplayEmpty
-} SemaphorDisplayState;
+};
 
-typedef struct
+struct DisplayState
 {
-    char left_display[LEFT_DISPLAY_SIZE + 1]; // add 1 for null symbol
-    char right_display[RIGHT_DISPLAY_SIZE + 1];
-    char middle_display[MIDDLE_DISPLAY_SIZE + 1];
-    SemaphorDisplayState semaphor_display;
-} DisplayState;
+    char leftDisplay[LEFT_DISPLAY_SIZE + 1]; // add 1 for null symbol
+    char rightDisplay[RIGHT_DISPLAY_SIZE + 1];
+    char middleDisplay[MIDDLE_DISPLAY_SIZE + 1];
+    SemaphorDisplayState semaphorDisplay;
 
-typedef struct
+    /**
+     * @brief display_state_clear Set the display state, so it would not display anything.
+     */
+    void clear();
+
+    void log() const;
+};
+
+class DisplayController
 {
-    ShiftRegister *shift_register;
-} DisplayController;
+    private:
+        ShiftRegister *m_shift_register;
+        DisplayState m_displayState;
 
-void display_controller_init(DisplayController *display, ShiftRegister *sr);
-void display_controller_display(DisplayController *display, DisplayState *state);
+    protected:
+        /**
+         * @brief symbol_to_display_segments Converts an ASCII symbol to a representation for a
+         * 7-segment display.
+         * @param symbol ASCII symbol. Supported symbols are {0-9, A-D, P}.
+         * @return Returns a 7-segment display representation of the symbol.
+         */
+        static uint8_t symbolToDisplayData(uint8_t symbol);
 
-/**
- * @brief display_state_clear Set the display state, so it would not display anything.
- * @param display_state Target display state
- */
-void display_state_clear(DisplayState *display_state);
+        // TODO doc
+        static uint8_t semaphorToDisplayData(SemaphorDisplayState semaphorState);
 
-/**
- * @brief symbol_to_display_segments Converts an ASCII symbol to a representation for a
- * 7-segment display.
- * @param symbol ASCII symbol. Supported symbols are {0-9, A-D, P}.
- * @return Returns a 7-segment display representation of the symbol.
- */
-uint8_t symbol_to_display_segments(unsigned char symbol);
+    public:
+        DisplayController(ShiftRegister* shiftRegister);
 
-// TODO doc
-uint8_t semaphor_to_display_data(SemaphorDisplayState semaphor_state);
-
-void display_state_print(DisplayState *display_state);
+        DisplayState* displayState();
+        void display();
+};
 
 #endif

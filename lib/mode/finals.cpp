@@ -139,11 +139,11 @@ void finals_mode_display(DisplayState *display, FinalsModeData *mode_data)
 
     base_mode_display_semaphor(display, mode_data->base);
     // set time
-    sprintf(display->left_display, "%3d", mode_data->left_current_time);
-    sprintf(display->right_display, "%3d", mode_data->right_current_time);
+    sprintf(display->leftDisplay, "%3d", mode_data->left_current_time);
+    sprintf(display->rightDisplay, "%3d", mode_data->right_current_time);
 
     // display turn
-    sprintf(display->middle_display, "%s",
+    sprintf(display->middleDisplay, "%s",
             (mode_data->current_turn == FinalsLeftTurn) ? "< " : " >");
 }
 
