@@ -16,6 +16,8 @@ enum MessageType
     InvalidMessageType = 255,
 };
 
+const char* messageTypeToString(MessageType msgType);
+
 class MessageInfo
 {
     public:
