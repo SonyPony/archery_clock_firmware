@@ -15,6 +15,25 @@ class MessageParser {
         InitializationCommand m_initCommand;
         BaseCommand m_baseCommand;
 
+    protected:
+    /**
+     * @brief parseInitializationCommand It extracts initialization data from the buffer
+     * based on the message info.
+     * @param buffer Message buffer.
+     * @param msg_info Message info that contains location of the initialization message.
+     * @param msg Location where the parsed initialization data will be stored.
+     */
+    InitializationCommand* parseInitializationCommand(MessageInfo msg_info, InitializationCommand *msg);
+
+    /**
+     * @brief parseBreakCommand It extracts the break data from the buffer based on the
+     * message info.
+     * @param buffer Message buffer.
+     * @param msg_info Message info that contains location of the initialization message.
+     * @param msg Location where the parsed break data will be stored.
+     */
+    BreakCommand* parseBreakCommand(MessageInfo msg_info, BreakCommand *msg);
+
     public:
         MessageParser(Buffer* buffer);
 
@@ -33,33 +52,6 @@ class MessageParser {
     // TODO update doc
     const BaseCommand* parseMessage();
 };
-
-/**
- * @brief initialization_message_valid Controls whether the size of initialization
- * message is correct.
- * @param msg_info Controlled message info.
- * @return Returns true if the message has correct size, otherwise it returns false.
- */
-// TODO update doc
-bool initialization_message_valid(MessageInfo *msg_info);
-
-/**
- * @brief parse_initialization_data It extracts initialization data from the buffer
- * based on the message info.
- * @param buffer Message buffer.
- * @param msg_info Message info that contains location of the initialization message.
- * @param msg Location where the parsed initialization data will be stored.
- */
-void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, InitializationCommand *msg);
-
-/**
- * @brief parse_break_data It extracts the break data from the buffer based on the
- * message info.
- * @param buffer Message buffer.
- * @param msg_info Message info that contains location of the initialization message.
- * @param msg Location where the parsed break data will be stored.
- */
-void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakCommand *msg);
 
 /**
  * @brief parse_message_info Parse the first found valid message info from the message buffer.

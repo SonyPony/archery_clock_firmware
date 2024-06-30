@@ -18,60 +18,54 @@ bool MessageParser::checkMessageValid(MessageInfo msgInfo, MessageType msgType) 
     else if(msgType == InitializationMessageType)
         return msgLength == 14;     // <{Id:1}{training_time:3}{warning_time:3}{rounds_count:2}{mode:3}>
     return msgLength == 3;   // <{Id:1}>
-
 }
 
-bool initialization_message_valid(MessageInfo *msg_info, Buffer* buffer)
+InitializationCommand* MessageParser::parseInitializationCommand(MessageInfo msg_info, InitializationCommand *msg)
 {
-    if (msg_info == NULL)
-        return false;
+    if(msg == nullptr)
+        return nullptr;
 
-    return buffer->bytesCount(msg_info->startIdx, msg_info->endIdx) == 14;     // <{Id:1}{training_time:3}{warning_time:3}{rounds_count:2}{mode:3}>
-}
-
-void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, InitializationCommand *msg)
-{
-    if (buffer == NULL || msg_info == NULL || msg == NULL)
-        return;
-
-    const uint32_t msgContentStartIdx = msg_info->startIdx + 2; // omit id symbol (+1) and start symbol
+    const uint32_t msgContentStartIdx = msg_info.startIdx + 2; // omit id symbol (+1) and start symbol
     const uint32_t msgTurnTypeStartIdx = msgContentStartIdx + 8;
 
     msg->turn_type = ABCD_TurnType; // default value
     msg->turns_per_round = 2;
-    msg->time_per_round = buffer->parseInt(msgContentStartIdx, 3);            // 3 decimals are reserved for time per round
-    msg->warning_time = buffer->parseInt(msgContentStartIdx + 3, 3);          // 3 decimals are reserved for warning time
-    msg->training_rounds_count = buffer->parseInt(msgContentStartIdx + 6, 2); // 2 decimals
+    msg->time_per_round = this->m_buffer->parseInt(msgContentStartIdx, 3);            // 3 decimals are reserved for time per round
+    msg->warning_time = this->m_buffer->parseInt(msgContentStartIdx + 3, 3);          // 3 decimals are reserved for warning time
+    msg->training_rounds_count = this->m_buffer->parseInt(msgContentStartIdx + 6, 2); // 2 decimals
     msg->prep_time = PREP_TIME;
 
-    if (buffer->compareString(msgTurnTypeStartIdx, "AB-"))
+    if (this->m_buffer->compareString(msgTurnTypeStartIdx, "AB-"))
         msg->turn_type = AB_TurnType;
-    else if (buffer->compareString(msgTurnTypeStartIdx, "ABC"))
+    else if (this->m_buffer->compareString(msgTurnTypeStartIdx, "ABC"))
         msg->turn_type = ABC_TurnType;
-    else if (buffer->compareString(msgTurnTypeStartIdx, "ABD"))
+    else if (this->m_buffer->compareString(msgTurnTypeStartIdx, "ABD"))
     {
         msg->turn_type = ABCD_TurnType;
         msg->turns_per_round = 2;
     }
-    else if (buffer->compareString(msgTurnTypeStartIdx, "F-I"))
+    else if (this->m_buffer->compareString(msgTurnTypeStartIdx, "F-I"))
     {
         msg->turn_type = FinalsIndividual_TurnType;
         msg->turns_per_round = 6;
     }
-    else if (buffer->compareString(msgTurnTypeStartIdx, "F-T"))
+    else if (this->m_buffer->compareString(msgTurnTypeStartIdx, "F-T"))
     {
         msg->turn_type = FinalsTeams_TurnType;
         msg->turns_per_round = 4;
     }
+    return msg;
 }
 
-void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakCommand *msg)
+BreakCommand* MessageParser::parseBreakCommand(MessageInfo msg_info, BreakCommand *msg)
 {
-    if (buffer == NULL || msg_info == NULL || msg == NULL)
-        return;
+    if (msg == nullptr)
+        return nullptr;
 
-    const uint32_t msgContentStartIdx = msg_info->startIdx + 2; // omit id symbol (+1) + start symbol
-    msg->break_time = buffer->parseInt(msgContentStartIdx, 5);                                 // 5 decimals are reserved for break time
+    const uint32_t msgContentStartIdx = msg_info.startIdx + 2; // omit id symbol (+1) + start symbol
+    msg->break_time = this->m_buffer->parseInt(msgContentStartIdx, 5);                                 // 5 decimals are reserved for break time
+
+    return msg;
 }
 
 void parse_message_info(Buffer *buffer, MessageInfo *message_info)
@@ -139,16 +133,10 @@ const BaseCommand* MessageParser::parseMessage()
     result->type = parsed_msg_type;
 
     if (parsed_msg_type == BreakMessageType)
-    {
-            parse_break_data(this->m_buffer, &msg_info, &m_breakCommand);
-            result = &m_breakCommand;
-    }
+        result = this->parseBreakCommand(msg_info, &m_breakCommand);
 
     else if (parsed_msg_type == InitializationMessageType)
-    {
-            parse_initialization_data(this->m_buffer, &msg_info, &m_initCommand);
-            result = &m_initCommand;
-    }
+        result = this->parseInitializationCommand(msg_info, &m_initCommand);
 
     // message parsed -> remove from buffer
     remove_message_from_buffer(&msg_info, this->m_buffer);
