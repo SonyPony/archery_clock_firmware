@@ -88,17 +88,17 @@ void display_controller_init(DisplayController *display, ShiftRegister *sr)
 void display_controller_display(DisplayController *display, DisplayState *state)
 {
     for (int i = 0; i < LEFT_DISPLAY_SIZE; i++)
-        sr_set_data(display->shift_register, symbol_to_display_segments(state->left_display[i]));
+        display->shift_register->setData(symbol_to_display_segments(state->left_display[i]));
     // TODO semaphor
-    sr_set_data(display->shift_register, semaphor_to_display_data(state->semaphor_display));
+    display->shift_register->setData(semaphor_to_display_data(state->semaphor_display));
 
     for (int i = 0; i < MIDDLE_DISPLAY_SIZE; i++)
-        sr_set_data(display->shift_register, symbol_to_display_segments(state->middle_display[i]));
+        display->shift_register->setData(symbol_to_display_segments(state->middle_display[i]));
 
     for (int i = 0; i < RIGHT_DISPLAY_SIZE; i++)
-        sr_set_data(display->shift_register, symbol_to_display_segments(state->right_display[i]));
+        display->shift_register->setData(symbol_to_display_segments(state->right_display[i]));
 
-    sr_confirm(display->shift_register);
+    display->shift_register->confirm();
 }
 
 void display_state_print(DisplayState *display_state)

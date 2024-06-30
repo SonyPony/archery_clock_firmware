@@ -1,22 +1,26 @@
 #include "gpioex.h"
 
-void GPIOex_Init(uint32_t pin, enum GPIOMode mode)
+GPIOPin::GPIOPin(uint32_t pin, enum GPIOMode mode, bool defaultValue)
 {
+    this->m_pin = pin;
     gpio_init(pin);
     gpio_set_dir(pin, static_cast<decltype(GPIO_OUT)>(mode));
+
+    if (mode == GPIOMode::GPIOOut)
+        this->write(defaultValue);
 }
 
-void GPIOex_Write(uint32_t pin, bool value)
+void GPIOPin::write(bool value)
 {
-    gpio_put(pin, value);
+    gpio_put(m_pin, value);
 }
 
-void GPIOex_WriteHigh(uint32_t pin)
+void GPIOPin::writeHigh()
 {
-     GPIOex_Write(pin, true);
+    this->write(true);
 }
 
-void GPIOex_WriteLow(uint32_t pin)
+void GPIOPin::writeLow()
 {
-    GPIOex_Write(pin, false);
+    this->write(false);
 }

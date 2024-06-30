@@ -9,9 +9,16 @@ enum GPIOMode {
     GPIOOut = GPIO_OUT
 };
 
-void GPIOex_Init(uint32_t pin, enum GPIOMode mode);
-void GPIOex_Write(uint32_t pin, bool value);
-void GPIOex_WriteHigh(uint32_t pin);
-void GPIOex_WriteLow(uint32_t pin);
+class GPIOPin {
+    protected:
+        uint32_t m_pin;
+    
+    public:
+        GPIOPin(uint32_t pin, enum GPIOMode mode, bool defaultValue = false);
+
+        void write(bool value);
+        void writeHigh();
+        void writeLow();
+};
 
 #endif

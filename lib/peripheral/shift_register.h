@@ -2,24 +2,28 @@
 #define _SHIFT_REGISTER_H_
 
 #include <stdint.h>
+#include <lib/peripheral/gpioex.h>
 
-typedef struct
+class ShiftRegister
 {
-    uint32_t clk_pin;
-    uint32_t data_pin;
-    uint32_t cs_pin;
-} ShiftRegister;
+    private:
+        GPIOPin m_clkPin;
+        GPIOPin m_dataPin;
+        GPIOPin m_csPin;
 
-void sr_init(ShiftRegister *sr, uint32_t clk_pin, uint32_t data_pin, uint32_t cs_pin);
+    public:
+        ShiftRegister(uint32_t clkPin, uint32_t dataPin, uint32_t csPin);
 
-/**
- * @brief sr_set_Data Set data to a shift register. However, the data is not set to the output, it needs to be confirmed.
- */
-void sr_set_data(ShiftRegister *sr, uint8_t data);
+        /**
+         * @brief sr_set_Data Set data to a shift register. However, the data is not set to the output, it needs to be confirmed.
+         */
+        void setData(uint8_t data);
 
-/**
- * @brief sr_confirm Data that has been sent to the shift register will be set to output pins of the register after confirmation.
- */
-void sr_confirm(ShiftRegister *sr);
+        /**
+         * @brief sr_confirm Data that has been sent to the shift register will be set to output pins of the register after confirmation.
+         */
+        // TODO update doc
+        void confirm();
+};
 
 #endif
