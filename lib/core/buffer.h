@@ -33,6 +33,7 @@ class Buffer
 
         uint32_t relativeIdx(uint32_t realIdx) const;
         uint32_t dataStartIdx() const;
+        uint32_t nextRealIdx(uint32_t readlIdx, uint32_t offset) const;
 
         // TODO doc
         uint32_t currentSize() const;

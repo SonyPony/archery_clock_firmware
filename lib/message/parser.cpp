@@ -3,20 +3,22 @@
 #include <stdlib.h>
 #include <lib/core/buffer.h>
 
-bool message_info_valid(MessageInfo *msg_info)
-{
-    if (msg_info == NULL)
-        return false;
-
-    return msg_info->startIdx != -1 && msg_info->endIdx != -1;
+MessageParser::MessageParser(Buffer* buffer) {
+    this->m_buffer = buffer;
 }
 
-bool break_message_valid(MessageInfo *msg_info, Buffer* buffer)
+bool MessageParser::checkMessageValid(MessageInfo msgInfo, MessageType msgType) const
 {
-    if (msg_info == NULL)
+    if (!msgInfo.valid())
         return false;
 
-    return buffer->bytesCount(msg_info->startIdx, msg_info->endIdx) == 8;   // <{Id:1}{break_time:5}>
+    const uint32_t msgLength = this->m_buffer->bytesCount(msgInfo.startIdx, this->m_buffer->nextRealIdx(msgInfo.endIdx, 1));    // needs to point on element after
+    if(msgType == BreakMessageType)
+        return msgLength == 8;   // <{Id:1}{break_time:5}>
+    else if(msgType == InitializationMessageType)
+        return msgLength == 14;     // <{Id:1}{training_time:3}{warning_time:3}{rounds_count:2}{mode:3}>
+    return msgLength == 3;   // <{Id:1}>
+
 }
 
 bool initialization_message_valid(MessageInfo *msg_info, Buffer* buffer)
@@ -112,7 +114,7 @@ void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
     if (msg_info == NULL || buffer == NULL)
         return;
 
-    if (!message_info_valid(msg_info))
+    if (!msg_info->valid())
         return;
 
     const uint32_t invalidBytes = (buffer->bytesCount(buffer->dataStartIdx(), msg_info->startIdx));
@@ -120,52 +122,35 @@ void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
     buffer->invalidateBytes(messageSize + invalidBytes);
 }
 
-void *parse_message(Buffer *buffer, BreakCommand *break_command, InitializationCommand *init_command, BaseCommand *base_command)
+const BaseCommand* MessageParser::parseMessage()
 {
-    if (buffer == NULL)
-        return NULL;
-
     MessageInfo msg_info;
-    void *result = NULL;
-    parse_message_info(buffer, &msg_info);
-    if (!message_info_valid(&msg_info))
-        return NULL;
+    BaseCommand *result = &m_baseCommand;
 
-    const MessageType parsed_msg_type = parse_message_type(&msg_info, buffer);
+    parse_message_info(this->m_buffer, &msg_info);
+    if (!msg_info.valid())
+        return nullptr;
+
+    const MessageType parsed_msg_type = parse_message_type(&msg_info, this->m_buffer);
+
+    if(!this->checkMessageValid(msg_info, parsed_msg_type))
+        return nullptr;
+
+    result->type = parsed_msg_type;
 
     if (parsed_msg_type == BreakMessageType)
     {
-        if (break_message_valid(&msg_info, buffer))
-        {
-            if (break_command == NULL)
-                return NULL;
-            parse_break_data(buffer, &msg_info, break_command);
-            result = break_command;
-        }
+            parse_break_data(this->m_buffer, &msg_info, &m_breakCommand);
+            result = &m_breakCommand;
     }
 
     else if (parsed_msg_type == InitializationMessageType)
     {
-        if (initialization_message_valid(&msg_info, buffer))
-        {
-            if (init_command == NULL)
-                return NULL;
-            parse_initialization_data(buffer, &msg_info, init_command);
-            init_command->prep_time = PREP_TIME;
-
-            result = init_command;
-        }
+            parse_initialization_data(this->m_buffer, &msg_info, &m_initCommand);
+            result = &m_initCommand;
     }
 
-    else    // NextStepMessageType, StartMessageType, StopMessageType, PreviousRoundMessageType, NextRoundMessageType, PauseMessageType
-    {
-        if (base_command == NULL)
-            return NULL;
-        result = base_command;
-    }
-
-    ((BaseCommand *)result)->type = parsed_msg_type;
     // message parsed -> remove from buffer
-    remove_message_from_buffer(&msg_info, buffer);
-    return (void *)result;
+    remove_message_from_buffer(&msg_info, this->m_buffer);
+    return result;
 }

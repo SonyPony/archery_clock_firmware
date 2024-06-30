@@ -44,9 +44,13 @@ uint32_t Buffer::dataStartIdx() const {
     return this->m_dataStartIdx;
 }
 
+uint32_t Buffer::nextRealIdx(uint32_t readlIdx, uint32_t offset) const {
+    return (readlIdx + offset) % this->m_capacity;
+}
+
 void Buffer::addByte(char byte) {
     this->m_data[*this->m_dataEndIdx] = byte;
-    *this->m_dataEndIdx = (*this->m_dataEndIdx + 1) % this->m_capacity;
+    *this->m_dataEndIdx = this->nextRealIdx(*this->m_dataEndIdx, 1);
 }
 
 void Buffer::invalidateBytes(uint32_t bytesCount) {

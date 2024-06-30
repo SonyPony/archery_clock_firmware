@@ -16,10 +16,20 @@ enum MessageType
     InvalidMessageType = 255,
 };
 
-struct MessageInfo
+class MessageInfo
 {
-    int startIdx; // points to the start index in message buffer
-    int endIdx;   // points to the end index in message buffer
+    public:
+        int startIdx; // points to the start index in message buffer
+        int endIdx;   // points to the end index in message buffer
+
+        MessageInfo();
+
+        /**
+         * @brief valid Controls if the message info is valid (points to valid location).
+         * @return Returns true if the message info points to valid location in message buffer,
+         * otherwise it returns false.
+         */
+        bool valid() const;
 } ;
 
 #endif // MESSAGE_INFO_H

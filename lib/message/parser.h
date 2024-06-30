@@ -8,21 +8,31 @@
 #define MESSAGE_START_SYMBOL '<'
 #define MESSAGE_END_SYMBOL '>'
 
-/**
- * @brief message_info_valid Controls if the message info is valid (points to valid location).
- * @param msg_info Controlled message info.
- * @return Returns true if the message info points to valid location in message buffer,
- * otherwise it returns false.
- */
-bool message_info_valid(MessageInfo *msg_info);
+class MessageParser {
+    private:
+        Buffer* m_buffer;
+        BreakCommand m_breakCommand;
+        InitializationCommand m_initCommand;
+        BaseCommand m_baseCommand;
 
-/**
- * @brief break_message_valid Controls whether the size of break message is correct.
- * @param msg_info Controlled message info.K
- * @return Returns true if the message has correct size, otherwise it returns false.
- */
-// TODO update doc
-bool break_message_valid(MessageInfo *msg_info, Buffer* buffer);
+    public:
+        MessageParser(Buffer* buffer);
+
+    /**
+     * @brief checkMessageValid Controls whether the size of a message is correct.
+     * @param msg_info Controlled message info.
+     * @return Returns true if the message has correct size, otherwise it returns false.
+     */
+    bool checkMessageValid(MessageInfo msgInfo, MessageType msgType) const;
+
+    /**
+     * @brief parse_message It parses a message from the buffer. It allocates the space on the heap as well.
+     * @return Returns a pointer to Command or InitializationCommand or BreakCommand. Commands have to be freed after processing.
+     * Or they will cause memory leaks.
+     */
+    // TODO update doc
+    const BaseCommand* parseMessage();
+};
 
 /**
  * @brief initialization_message_valid Controls whether the size of initialization
@@ -50,15 +60,6 @@ void parse_initialization_data(Buffer *buffer, MessageInfo *msg_info, Initializa
  * @param msg Location where the parsed break data will be stored.
  */
 void parse_break_data(Buffer *buffer, MessageInfo *msg_info, BreakCommand *msg);
-
-/**
- * @brief parse_message It parses a message from the buffer. It allocates the space on the heap as well.
- * @param buffer Message buffer.
- * @return Returns a pointer to Command or InitializationCommand or BreakCommand. Commands have to be freed after processing.
- * Or they will cause memory leaks.
- */
-// TODO update doc
-void *parse_message(Buffer *buffer, BreakCommand *break_command, InitializationCommand *init_command, BaseCommand *base_command);
 
 /**
  * @brief parse_message_info Parse the first found valid message info from the message buffer.
