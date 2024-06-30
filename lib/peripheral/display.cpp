@@ -43,15 +43,15 @@ DisplayState *DisplayController::displayState()
 
 void DisplayController::display()
 {
-    for (int i = 0; i < LEFT_DISPLAY_SIZE; i++)
+    for (int i = 0; i < DisplayState::leftDisplaySize; i++)
         this->m_shift_register->setData(DisplayController::symbolToDisplayData(m_displayState.leftDisplay[i]));
 
     this->m_shift_register->setData(DisplayController::semaphorToDisplayData(m_displayState.semaphorDisplay));
 
-    for (int i = 0; i < MIDDLE_DISPLAY_SIZE; i++)
+    for (int i = 0; i < DisplayState::middleDisplaySize; i++)
         this->m_shift_register->setData(DisplayController::symbolToDisplayData(m_displayState.middleDisplay[i]));
 
-    for (int i = 0; i < RIGHT_DISPLAY_SIZE; i++)
+    for (int i = 0; i < DisplayState::rightDisplaySize; i++)
         this->m_shift_register->setData(DisplayController::symbolToDisplayData(m_displayState.rightDisplay[i]));
 
     this->m_shift_register->confirm();

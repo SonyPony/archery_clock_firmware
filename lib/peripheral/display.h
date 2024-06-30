@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <lib/peripheral/shift_register.h>
 
-#define LEFT_DISPLAY_SIZE 3   // 3 symbols
-#define RIGHT_DISPLAY_SIZE 3  // 3 symbols
-#define MIDDLE_DISPLAY_SIZE 2 // 2 symbols
 
 enum SemaphorDisplayState
 {
@@ -18,9 +15,13 @@ enum SemaphorDisplayState
 
 struct DisplayState
 {
-    char leftDisplay[LEFT_DISPLAY_SIZE + 1]; // add 1 for null symbol
-    char rightDisplay[RIGHT_DISPLAY_SIZE + 1];
-    char middleDisplay[MIDDLE_DISPLAY_SIZE + 1];
+    static constexpr uint32_t leftDisplaySize = 3;      // 3 symbols
+    static constexpr uint32_t rightDisplaySize = 3;     // 3 symbols
+    static constexpr uint32_t middleDisplaySize = 2;    // 2 symbols
+
+    char leftDisplay[DisplayState::leftDisplaySize + 1]; // add 1 for null symbol
+    char rightDisplay[DisplayState::rightDisplaySize + 1];
+    char middleDisplay[DisplayState::middleDisplaySize + 1];
     SemaphorDisplayState semaphorDisplay;
 
     /**
