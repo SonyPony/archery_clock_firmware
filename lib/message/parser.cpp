@@ -20,12 +20,12 @@ bool MessageParser::checkMessageValid(MessageInfo msgInfo, MessageType msgType) 
     return msgLength == 3;   // <{Id:1}>
 }
 
-InitializationCommand* MessageParser::parseInitializationCommand(MessageInfo msg_info, InitializationCommand *msg)
+InitializationCommand* MessageParser::parseInitializationCommand(MessageInfo msgInfo, InitializationCommand *msg)
 {
     if(msg == nullptr)
         return nullptr;
 
-    const uint32_t msgContentStartIdx = msg_info.startIdx + 2; // omit id symbol (+1) and start symbol
+    const uint32_t msgContentStartIdx = msgInfo.startIdx + 2; // omit id symbol (+1) and start symbol
     const uint32_t msgTurnTypeStartIdx = msgContentStartIdx + 8;
 
     msg->turn_type = ABCD_TurnType; // default value
@@ -57,45 +57,45 @@ InitializationCommand* MessageParser::parseInitializationCommand(MessageInfo msg
     return msg;
 }
 
-BreakCommand* MessageParser::parseBreakCommand(MessageInfo msg_info, BreakCommand *msg)
+BreakCommand* MessageParser::parseBreakCommand(MessageInfo msgInfo, BreakCommand *msg)
 {
     if (msg == nullptr)
         return nullptr;
 
-    const uint32_t msgContentStartIdx = msg_info.startIdx + 2; // omit id symbol (+1) + start symbol
+    const uint32_t msgContentStartIdx = msgInfo.startIdx + 2; // omit id symbol (+1) + start symbol
     msg->break_time = this->m_buffer->parseInt(msgContentStartIdx, 5);                                 // 5 decimals are reserved for break time
 
     return msg;
 }
 
-void parse_message_info(Buffer *buffer, MessageInfo *message_info)
+MessageInfo MessageParser::parseMessageInfo() const
 {
-    if (buffer == NULL || message_info == NULL)
-        return;
+    MessageInfo msgInfo;    // start with invalid message
+    if (m_buffer == nullptr)
+        return msgInfo;
 
-    message_info->startIdx = -1;
-    message_info->endIdx = -1; // start with invalid message
-
-    for (int i = 0; i < buffer->currentSize(); i++)
+    for (int i = 0; i < this->m_buffer->currentSize(); i++)
     {
-        if (buffer->byte(i) == MESSAGE_START_SYMBOL)
-            message_info->startIdx = buffer->realIdx(i);
+        const char byteData = this->m_buffer->byte(i);
+        if (byteData == MESSAGE_START_SYMBOL)
+            msgInfo.startIdx = this->m_buffer->realIdx(i);
 
-        else if (buffer->byte(i) == MESSAGE_END_SYMBOL && message_info->startIdx != -1)
+        else if (byteData == MESSAGE_END_SYMBOL && msgInfo.startIdx != -1)
         {
-            message_info->endIdx = buffer->realIdx(i);
+            msgInfo.endIdx = this->m_buffer->realIdx(i);
             break;
         }
     }
+    return msgInfo;
 }
 
-MessageType parse_message_type(MessageInfo *msg_info, Buffer *buffer)
+MessageType MessageParser::parseMessageType(MessageInfo msgInfo) const
 {
-    if (msg_info == NULL || buffer == NULL)
+    if (this->m_buffer == nullptr)
         return InvalidMessageType;
 
-    const uint32_t relativeIdxMsgStart = buffer->relativeIdx(msg_info->startIdx + 1);   // add 1 to skip start symbol
-    const uint8_t raw_type = buffer->byte(relativeIdxMsgStart); 
+    const uint32_t relativeIdxMsgStart = this->m_buffer->relativeIdx(msgInfo.startIdx + 1);   // add 1 to skip start symbol
+    const uint8_t raw_type = this->m_buffer->byte(relativeIdxMsgStart); 
     if (raw_type >= '0' && raw_type <= '7')
         return static_cast<MessageType>(raw_type - '0');
     else if (raw_type >= 'a' && raw_type <= 'b')
@@ -103,29 +103,25 @@ MessageType parse_message_type(MessageInfo *msg_info, Buffer *buffer)
     return InvalidMessageType;
 }
 
-void remove_message_from_buffer(MessageInfo *msg_info, Buffer *buffer)
+void MessageParser::removeMessageFromBuffer(MessageInfo msgInfo)
 {
-    if (msg_info == NULL || buffer == NULL)
+    if (this->m_buffer == nullptr || !msgInfo.valid())
         return;
 
-    if (!msg_info->valid())
-        return;
-
-    const uint32_t invalidBytes = (buffer->bytesCount(buffer->dataStartIdx(), msg_info->startIdx));
-    const uint32_t messageSize = buffer->bytesCount(msg_info->startIdx, msg_info->endIdx + 1);      // needs to point on the edge of message (next element after message)
-    buffer->invalidateBytes(messageSize + invalidBytes);
+    const uint32_t invalidBytes = (this->m_buffer->bytesCount(this->m_buffer->dataStartIdx(), msgInfo.startIdx));
+    const uint32_t messageSize = this->m_buffer->bytesCount(msgInfo.startIdx, msgInfo.endIdx + 1);      // needs to point on the edge of message (next element after message)
+    this->m_buffer->invalidateBytes(messageSize + invalidBytes);
 }
 
 const BaseCommand* MessageParser::parseMessage()
 {
-    MessageInfo msg_info;
+    const MessageInfo msg_info = this->parseMessageInfo();
     BaseCommand *result = &m_baseCommand;
 
-    parse_message_info(this->m_buffer, &msg_info);
     if (!msg_info.valid())
         return nullptr;
 
-    const MessageType parsed_msg_type = parse_message_type(&msg_info, this->m_buffer);
+    const MessageType parsed_msg_type = this->parseMessageType(msg_info);
 
     if(!this->checkMessageValid(msg_info, parsed_msg_type))
         return nullptr;
@@ -139,6 +135,6 @@ const BaseCommand* MessageParser::parseMessage()
         result = this->parseInitializationCommand(msg_info, &m_initCommand);
 
     // message parsed -> remove from buffer
-    remove_message_from_buffer(&msg_info, this->m_buffer);
+    this->removeMessageFromBuffer(msg_info);
     return result;
 }
