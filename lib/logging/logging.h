@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#define PC_UART_CHANNEL 1
-
 namespace Logging {
     void log(const char *format, ...);
 }
