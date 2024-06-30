@@ -50,220 +50,137 @@ void RoundInfo::setNextRound()
         this->m_currentRound = 99;
 }
 
-void base_mode_init(
-    BaseModeData *mode_data,
-    RoundInfo* round_info,
-    InitializationCommand *init_data,
-    NextStepCallback_t *next_step_func,
-    HandleSecTickCallback_t *handle_sec_tic_func,
-    PrintCallback_t *print_func,
-    ResetStateCallback_t *reset_state_func,
-    DisplayCallback_t *display_func,
-    FreeCallback_t *free_func)
-{
-    if (mode_data == NULL)
-        return;
+BaseModeData::BaseModeData(InitializationCommand initData) {
+    this->m_currentTimer = nullptr;
 
-    mode_data->round_info = round_info;
-    mode_data->next_step = next_step_func;
-    mode_data->handle_sec_tic = handle_sec_tic_func;
-    mode_data->print = print_func;
-    mode_data->reset_state = reset_state_func;
-    mode_data->free = free_func;
-    mode_data->display = display_func;
-
-    base_mode_reset_state(mode_data, init_data);
+    this->resetState(initData);
 }
 
-void base_mode_reset_state(BaseModeData *mode_data, InitializationCommand *init_data)
-{
-    if (mode_data == NULL || init_data == NULL)
-        return;
+void BaseModeData::resetState(InitializationCommand initData) {
+    this->m_running = false;
+    this->m_paused = false;
+    this->m_initData = initData;
+    this->m_isBreak = false;
+    this->m_breakTimer = 0;
+    this->m_roundInfo = RoundInfo(initData.training_rounds_count);
 
-    mode_data->running = false;
-    mode_data->paused = false;
-    mode_data->init_data = init_data;
-    mode_data->is_break = false;
-    mode_data->_break_timer = 0;
-
-    base_mode_restore_prep_time(mode_data);
-
-    round_info_init(mode_data->round_info, init_data->training_rounds_count);
+    this->restorePrepTimer();
 }
 
-void base_mode_restore_prep_time(BaseModeData *mode_data)
-{
-    mode_data->_prep_timer = mode_data->init_data->prep_time;
-    mode_data->current_timer = &mode_data->_prep_timer;
+void BaseModeData::restorePrepTimer() {
+    this->m_prepTimer = this->m_initData.prep_time;
+    this->m_currentTimer = &this->m_prepTimer;
 }
 
-void base_mode_set_current_time(BaseModeData *mode_data, int value)
-{
-    if (mode_data == NULL)
-        return;
-
-    *(mode_data->current_timer) = value;
+bool BaseModeData::running() const {
+    return this->m_running;
 }
 
-void base_mode_decrement_current_time(BaseModeData *mode_data)
-{
-    if (mode_data == NULL)
-        return;
-
-    *(mode_data->current_timer) -= 1;
+int BaseModeData::currentTime() const {
+    return *(this->m_currentTimer);
 }
 
-int base_mode_current_time(BaseModeData *mode_data)
+void BaseModeData::decrementCurrentTime()
 {
-    return *(mode_data->current_timer);
+    *(this->m_currentTimer) -= 1;
 }
 
-void base_mode_set_running(BaseModeData *mode_data, bool running)
-{
-    mode_data->running = running;
-    if (mode_data->running)
-        base_mode_restore_prep_time(mode_data);
-
+void BaseModeData::setRunning(bool running) {
+    this->m_running = running;
+    if(this->m_running)
+        this->restorePrepTimer();
     else
-        base_mode_next_round(mode_data);
+        this->setNextRound();
 }
 
-bool base_mode_running(BaseModeData *mode_data)
+bool BaseModeData::isPrepTime() const
 {
-    if (mode_data == NULL)
-        return false;
-    return mode_data->running;
+    return this->m_prepTimer > 0;
 }
 
-bool base_mode_prep_time(BaseModeData *mode_data)
+bool BaseModeData::isWarningTime() const
 {
-    if (mode_data == NULL)
-        return false;
-    return mode_data->_prep_timer > 0;
-}
-
-bool base_mode_in_warning_time(BaseModeData *mode_data)
-{
-    if (mode_data == NULL)
-        return false;
-
-    if (!base_mode_prep_time(mode_data))
-        return base_mode_current_time(mode_data) <= mode_data->init_data->warning_time;
+    if (!this->isPrepTime())
+        return this->currentTime() <= this->m_initData.warning_time;
     return false;
 }
 
-void base_mode_next_round(BaseModeData *mode_data)
-{
-    if (mode_data == NULL)
-        return;
-
-    round_info_next_round(mode_data->round_info);
+void BaseModeData::setNextRound() {
+    this->m_roundInfo.setNextRound();
 }
 
-void base_mode_prev_round(BaseModeData *mode_data)
-{
-    if (mode_data == NULL)
-        return;
-
-    round_info_prev_round(mode_data->round_info);
+void BaseModeData::setPreviousRound() {
+    this->m_roundInfo.setPreviousRound();
 }
 
-void base_mode_round_display(BaseModeData *mode_data, char *target)
+void BaseModeData::displayRound(char *targetBuffer) const
 {
-    if (mode_data == NULL || target == NULL)
+    if (targetBuffer == nullptr)
         return;
 
     // there are two digits for round
-    if (mode_data->round_info->training)
+    if (this->m_roundInfo.isTraining())
     {
-        target[0] = 'P';
-        target[1] = mode_data->round_info->current_round % 10 + '0';
+        targetBuffer[0] = 'P';
+        targetBuffer[1] = this->m_roundInfo.currentRound() % 10 + '0';
         return;
     }
 
     // competition round
-    sprintf(target, "%2d", mode_data->round_info->current_round % 100);
+    sprintf(targetBuffer, "%2d", this->m_roundInfo.currentRound() % 100);
 }
 
-void base_mode_free(void **mode_data)
+bool BaseModeData::currentTimerIsPrepTimer() const 
 {
-    if (*mode_data == NULL)
-        return;
-    free(*mode_data);
-    *mode_data = NULL;
+    return this->m_currentTimer == &this->m_prepTimer;
 }
 
-bool base_mode_current_timer_is_prep(BaseModeData *mode_data)
+void BaseModeData::displaySemaphor(DisplayState *displayState) const
 {
-    if (mode_data == NULL)
-        return false;
-    return mode_data->current_timer == &mode_data->_prep_timer;
-}
-
-void base_mode_display_semaphor(DisplayState *display, BaseModeData *mode_data)
-{
-    if (display == NULL || mode_data == NULL)
+    if (displayState == nullptr)
         return;
 
     // set sempahor color
-    if (base_mode_prep_time(mode_data))
-        display->semaphorDisplay = SemaphorDisplayRed;
-    else if (base_mode_in_warning_time(mode_data))
-        display->semaphorDisplay = SemaphorDisplayOrange;
+    if (this->isPrepTime())
+        displayState->semaphorDisplay = SemaphorDisplayRed;
+    else if (this->isWarningTime())
+        displayState->semaphorDisplay = SemaphorDisplayOrange;
     else
-        display->semaphorDisplay = SemaphorDisplayGreen;
+        displayState->semaphorDisplay = SemaphorDisplayGreen;
 }
 
-void base_mode_free_internal(BaseModeData **mode_data)
+void BaseModeData::displayBreak(DisplayState *displayState) const
 {
-    free((*mode_data)->round_info);
-    (*mode_data)->round_info = NULL;
-    free(*mode_data);
-    *mode_data = NULL;
-}
-
-void base_mode_pause(BaseModeData *mode_data)
-{
-    if (mode_data == NULL)
+    if (displayState == nullptr)
         return;
 
-    mode_data->paused = true;
-    mode_data->running = false;
-}
-
-void base_mode_resume(BaseModeData *mode_data)
-{
-    if (mode_data == NULL)
-        return;
-
-    mode_data->paused = false;
-    mode_data->running = true;
-}
-
-void base_mode_break(BaseModeData *mode_data, int break_time)
-{
-    if (mode_data == NULL)
-        return;
-
-    if (base_mode_running(mode_data)) // do nothing if the mode is running (can't insert a break)
-        return;
-
-    mode_data->is_break = true;
-    mode_data->_break_timer = break_time;
-}
-
-void base_mode_display_break(DisplayState *display, BaseModeData *mode_data)
-{
-    if (display == NULL || mode_data == NULL)
-        return;
-
-    const int current_time = mode_data->_break_timer;
+    const int current_time = this->m_breakTimer;
     const int minutes = current_time / 60;
     const int seconds = current_time % 60;
-    display->semaphorDisplay = (current_time % 2) ? SemaphorDisplayOrange : SemaphorDisplayEmpty;
+    displayState->semaphorDisplay = (current_time % 2) ? SemaphorDisplayOrange : SemaphorDisplayEmpty;
     
-    sprintf(display->middleDisplay, "%s", "--");
-    sprintf(display->leftDisplay, "%3d", minutes);
-    sprintf(display->rightDisplay, "%3d", seconds);
+    sprintf(displayState->middleDisplay, "%s", "--");
+    sprintf(displayState->leftDisplay, "%3d", minutes);
+    sprintf(displayState->rightDisplay, "%3d", seconds);
+}
 
+void BaseModeData::pause()
+{
+    this->m_paused = true;
+    this->m_running = false;
+}
+
+void BaseModeData::resume()
+{
+    this->m_paused = false;
+    this->m_running = true;
+}
+
+void BaseModeData::startBreak(int breakTime)
+{
+    if (this->running()) // do nothing if the mode is running (can't insert a break)
+        return;
+
+    this->m_isBreak = true;
+    this->m_breakTimer = breakTime;
 }
