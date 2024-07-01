@@ -50,10 +50,8 @@ void RoundInfo::setNextRound()
         this->m_currentRound = 99;
 }
 
-BaseModeData::BaseModeData(InitializationCommand initData) {
+BaseModeData::BaseModeData() {
     this->m_currentTimer = nullptr;
-
-    this->resetState(initData);
 }
 
 void BaseModeData::resetState(InitializationCommand initData) {
@@ -103,6 +101,10 @@ bool BaseModeData::isWarningTime() const
     if (!this->isPrepTime())
         return this->currentTime() <= this->m_initData.warning_time;
     return false;
+}
+
+void BaseModeData::setCurrentTimer(int* newTimer) {
+    this->m_currentTimer = newTimer;
 }
 
 void BaseModeData::setNextRound() {
@@ -183,4 +185,65 @@ void BaseModeData::startBreak(int breakTime)
 
     this->m_isBreak = true;
     this->m_breakTimer = breakTime;
+}
+
+bool BaseModeData::nextStep() {
+    // prep time can't be skipped
+    if(this->running() && this->isPrepTime())
+        return true;
+
+    // if it's paused then resume
+    if(this->m_paused) {
+        this->resume();
+        return true;
+    }
+
+    // if there is a break, stop it and proceed with next step
+    if(this->m_isBreak) {
+        this->m_isBreak = false;
+        this->m_breakTimer = 0;
+    }
+
+    return false;
+}
+
+bool BaseModeData::handleSecTick() {
+    if(this->m_isBreak) {     // handle break 
+        this->m_breakTimer--;
+        if(this->m_breakTimer <= 0) {
+            this->m_isBreak = false;
+            this->nextStep();
+        }
+        return true;
+    }
+
+    if(!this->running())
+        return true;
+
+    // handle prep time
+    this->decrementCurrentTime();
+
+    if(this->isPrepTime())
+        return true;
+    return false;
+}
+
+bool BaseModeData::display(DisplayState* displayState) const {
+    if(this->m_isBreak) {
+        this->displayBreak(displayState);
+        return true;
+    }
+    return false;
+}
+
+InitializationCommand BaseModeData::initializationData() const {
+    return m_initData;
+}
+
+RoundInfo BaseModeData::roundInfo() const {
+    return this->m_roundInfo;
+}
+
+bool BaseModeData::isBreak() const {
+    return this->m_isBreak;
 }

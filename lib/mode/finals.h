@@ -4,30 +4,32 @@
 #include <lib/data/data_model.h>
 #include <lib/mode/base.h>
 
-typedef enum
+enum FinalsTurns
 {
     FinalsLeftTurn,
     FinalsRightTurn,
-} FinalsTurns;
+};
 
-typedef struct
+class FinalsModeData: public BaseModeData
 {
-    FinalsTurns current_turn;
-    int left_current_time;        // in seconds
-    int right_current_time;       // in seconds
-    int _current_turn_this_round; // number of turns that have were this round
-    bool _reset_time_after_turn;
-    BaseModeData *base;
-} FinalsModeData;
+    private:
+        FinalsTurns m_currentTurn;
+        int m_leftCurrentTime;        // in seconds
+        int m_rightCurrentTime;       // in seconds
+        int m_currentTurnThisRound; // number of turns that have were this round
+        bool m_resetTimeAfterTurn;
 
-void finals_mode_init(FinalsModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data);
-void finals_mode_next_step(FinalsModeData *mode_data);
-void finals_mode_handle_sec_tick(FinalsModeData *mode_data);
-void finals_mode_print(FinalsModeData *mode_data);
-void finals_mode_reset_state(FinalsModeData *mode_data, InitializationCommand *init_data);
-void finals_mode_display(DisplayState *display, FinalsModeData *mode_data);
-void finals_mode_next_turn(FinalsModeData *mode_data);
-void finals_mode_end_round(FinalsModeData *mode_data);
-void finals_mode_free(void **mode_data);
+    public:
+        FinalsModeData();
+
+        bool nextStep() override;
+        bool handleSecTick() override;
+        void log() const override;
+        bool display(DisplayState* displayState) const override;
+        void resetState(InitializationCommand initData) override;
+
+        void nextTurn();
+        void endRound();
+};
 
 #endif // FINALS_H

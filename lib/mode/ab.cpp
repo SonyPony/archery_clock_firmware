@@ -3,95 +3,74 @@
 #include <stdlib.h>
 #include <lib/logging/logging.h>
 
-void ab_mode_init(AbModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data)
-{
-    if (mode_data == NULL)
-        return;
+AbModeData::AbModeData(): BaseModeData() 
+{}
 
-    mode_data->base = base_mode_data;
-    base_mode_init(
-        mode_data->base,
-        round_info,
-        init_data,
-        (NextStepCallback_t *)&ab_mode_next_step,
-        (HandleSecTickCallback_t *)&ab_mode_handle_sec_tick,
-        (PrintCallback_t *)&ab_mode_print,
-        (ResetStateCallback_t *)&ab_mode_reset_state,
-        (DisplayCallback_t *)&ab_mode_display,
-        (FreeCallback_t *)&ab_mode_free);
-}
+bool AbModeData::nextStep() {
+    const bool alreadyMovedToNextStep = BaseModeData::nextStep();
+    if(alreadyMovedToNextStep)
+        return true;
 
-void ab_mode_next_step(AbModeData *mode_data)
-{
-    if (mode_data == NULL)
-        return;
-
-    BASE_MODE_HANDLE_NEXT_STEP();
-
-    if (!base_mode_running(mode_data->base))
-    { // not running -> run;
-        base_mode_set_running(mode_data->base, true);
-        mode_data->current_time = mode_data->base->init_data->time_per_round;
-        return;
+    if(!this->running())   // not running -> run;
+    {
+        this->setRunning(true);
+        this->m_currentTime = this->initializationData().time_per_round;
+        return true;
     }
 
     // if it's running do following
-    base_mode_set_running(mode_data->base, false);
-    mode_data->current_time = 0;
+    this->setRunning(false);
+    this->m_currentTime = 0;
+
+    return true;
 }
 
-void ab_mode_handle_sec_tick(AbModeData *mode_data)
-{
-    if (mode_data == NULL)
-        return;
+bool AbModeData::handleSecTick() {
+    const bool alreadyHandledSecTick = BaseModeData::handleSecTick();
+    if(alreadyHandledSecTick)
+        return true;
 
-    BASE_MODE_HANDLE_SEC_TICK();
-
-    mode_data->base->current_timer = &mode_data->current_time;
-
-    if (base_mode_current_time(mode_data->base) == 0)
-    {
-        base_mode_set_running(mode_data->base, false);
-        return;
+    this->setCurrentTimer(&this->m_currentTime);
+    if(this->currentTime() == 0) {
+        this->setRunning(false);
+        return true;
     }
+
+    return true;
 }
 
-void ab_mode_print(AbModeData *mode_data)
+void AbModeData::log() const
 {
     Logging::log(
         "AB(time: %d s, running: %s, prep: %s, training: %s, round: %d)\n\r",
-        base_mode_current_time(mode_data->base),
-        (base_mode_running(mode_data->base)) ? "true" : "false",
-        (base_mode_prep_time(mode_data->base)) ? "true" : "false",
-        (mode_data->base->round_info->training) ? "true" : "false",
-        mode_data->base->round_info->current_round);
+        this->currentTime(),
+        (this->running()) ? "true" : "false",
+        (this->isPrepTime()) ? "true" : "false",
+        (this->roundInfo().isTraining()) ? "true" : "false",
+        this->roundInfo().currentRound());
 }
 
-void ab_mode_display(DisplayState *display, AbModeData *mode_data)
+bool AbModeData::display(DisplayState *displayState) const
 {
-    if (display == NULL || mode_data == NULL)
-        return;
+    if (displayState == nullptr)
+        return false;
 
-    BASE_MODE_DISPLAY();
+    const bool alreadyHandledDisplay = BaseModeData::display(displayState);
+    if(alreadyHandledDisplay)
+        return true;
 
     // set time
-    sprintf(display->leftDisplay, "%3d", base_mode_current_time(mode_data->base));
+    sprintf(displayState->leftDisplay, "%3d", this->currentTime());
     // set turn
-    sprintf(display->rightDisplay, "%s", "AB ");
+    sprintf(displayState->rightDisplay, "%s", "AB ");
 
-    base_mode_display_semaphor(display, mode_data->base);
-    base_mode_round_display(mode_data->base, display->middleDisplay);
+    this->displaySemaphor(displayState);
+    this->displayRound(displayState->middleDisplay);
+    return true;
 }
 
-void ab_mode_reset_state(AbModeData *mode_data, InitializationCommand *init_data)
+void AbModeData::resetState(InitializationCommand initData)
 {
-    base_mode_reset_state(mode_data->base, init_data);
-    mode_data->current_time = mode_data->base->init_data->time_per_round;
-}
-
-void ab_mode_free(void **mode_data)
-{
-    AbModeData **casted_mode_data = (AbModeData **)(mode_data);
-    base_mode_free_internal(&(*casted_mode_data)->base);
-    base_mode_free(mode_data);
+    BaseModeData::resetState(initData);
+    this->m_currentTime = initData.time_per_round;
 }

@@ -4,46 +4,6 @@
 #include <lib/data/data_model.h>
 #include <lib/peripheral/display.h>
 
-#define BASE_MODE_HANDLE_NEXT_STEP() { \
-    /* prep time can't be skipped */ \
-    if(base_mode_running(mode_data->base) && base_mode_prep_time(mode_data->base)) \
-        return; \
-    if(mode_data->base->paused) { \
-        base_mode_resume(mode_data->base); \
-        return; \
-    } \
-    if(mode_data->base->is_break) { \
-        mode_data->base->is_break = false; \
-        mode_data->base->_break_timer = 0; \
-    } \
-}
-
-#define BASE_MODE_HANDLE_SEC_TICK() { \
-    if(mode_data->base->is_break) { /* handle break */ \
-        mode_data->base->_break_timer--; \
-        if(mode_data->base->_break_timer <= 0) { \
-            mode_data->base->is_break = false; \
-            mode_data->base->next_step(mode_data); \
-        } \
-        return; \
-    } \
-\
-    if(!base_mode_running(mode_data->base)) \
-        return; \
-    /* handle prep time */ \
-    base_mode_decrement_current_time(mode_data->base); \
-\
-    const bool prep_time_running =  base_mode_prep_time(mode_data->base); \
-    if(prep_time_running) \
-        return; \
-}
-
-#define BASE_MODE_DISPLAY() { \
-    if(mode_data->base->is_break) { \
-        base_mode_display_break(display, mode_data->base); \
-        return; \
-    } \
-}
 
 class RoundInfo
 {
@@ -53,7 +13,7 @@ class RoundInfo
         bool m_isTraining;
 
     public:
-        RoundInfo(int trainingRoundsCount);
+        RoundInfo(int trainingRoundsCount = 0);
 
         bool isTraining() const;
         int currentRound() const;
@@ -83,16 +43,16 @@ class BaseModeData
         void displayBreak(DisplayState* displayState) const;
 
     public:
-        BaseModeData(InitializationCommand initData);
+        BaseModeData();
 
-        void resetState(InitializationCommand initData);
         void restorePrepTimer();
 
-        virtual void nextStep();
-        virtual void handleSecTick();
-        virtual void log();
-        virtual void resetState();
-        virtual void display(DisplayState* displayState);
+        // TODO doc
+        virtual bool nextStep();
+        virtual bool handleSecTick();
+        virtual void log() const;
+        virtual void resetState(InitializationCommand initData);
+        virtual bool display(DisplayState* displayState) const;
 
         void pause();
         void resume();
@@ -108,12 +68,16 @@ class BaseModeData
         void setNextRound();
         void setPreviousRound();
         void decrementCurrentTime();
+        void setCurrentTimer(int* newTimer);
 
         bool running() const;
         int currentTime() const;
         bool isPrepTime() const;
         bool isWarningTime() const;
         bool currentTimerIsPrepTimer() const;
+        InitializationCommand initializationData() const;
+        RoundInfo roundInfo() const;
+        bool isBreak() const;
 } ;
 
 #endif // BASE_H

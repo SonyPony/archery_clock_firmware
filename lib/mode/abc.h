@@ -1,14 +1,18 @@
 #ifndef ABC_H
 #define ABC_H
 
-#include "base.h"
+#include <lib/mode/base.h>
 #include <lib/data/data_model.h>
 #include "ab.h"
 
-typedef AbModeData AbcModeData;
 
-void abc_mode_init(AbcModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data);
-void abc_mode_print(AbcModeData *mode_data);
-void abc_mode_display(DisplayState *display, AbcModeData *mode_data);
+class AbcModeData: public AbModeData 
+{
+    public:
+        AbcModeData();
+
+        void log() const override;
+        bool display(DisplayState* displayState) const override;
+};
 
 #endif // ABC_H

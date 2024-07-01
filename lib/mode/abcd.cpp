@@ -4,128 +4,101 @@
 #include <lib/mode/base.h>
 #include <lib/logging/logging.h>
 
-void abcd_mode_init(AbcdModeData *mode_data, BaseModeData *base_mode_data, RoundInfo *round_info, InitializationCommand *init_data)
+AbcdModeData::AbcdModeData() : BaseModeData()
 {
-    if (mode_data == NULL)
-        return;
-
-    mode_data->base = base_mode_data;
-    base_mode_init(
-        mode_data->base,
-        round_info,
-        init_data,
-        (NextStepCallback_t *)&abcd_mode_next_step,
-        (HandleSecTickCallback_t *)&abcd_mode_handle_sec_tick,
-        (PrintCallback_t *)&abcd_mode_print,
-        (ResetStateCallback_t *)&abcd_mode_reset_state,
-        (DisplayCallback_t *)&abcd_mode_display,
-        (FreeCallback_t *)&abcd_mode_free);
-    abcd_mode_reset_state(mode_data, init_data);
 }
 
-void abcd_mode_next_step(AbcdModeData *mode_data)
+bool AbcdModeData::nextStep()
 {
-    if (mode_data == NULL)
-        return;
+    const bool alreadyMovedToNextStep = BaseModeData::nextStep();
+    if (alreadyMovedToNextStep)
+        return true;
 
-    BASE_MODE_HANDLE_NEXT_STEP();
-
-    if (!base_mode_running(mode_data->base))
-    { // not running -> run; take turn from previous round
-        base_mode_set_running(mode_data->base, true);
-        mode_data->current_time = mode_data->base->init_data->time_per_round;
+    if (!this->running()) // not running -> run; take turn from previous round
+    {
+        this->setRunning(true);
+        this->m_currentTime = this->initializationData().time_per_round;
 
         // handle that there is even number of training rounds -> start the competition always with Ab round
-        if (round_info_first_competition_round(mode_data->base->round_info))
+        if (this->roundInfo().isFirstCompetitionRound())
         {
-            mode_data->current_turn = AbTurn;
+            this->m_currentTurn = AbTurn;
         }
     }
 
-    else
-    { // if it's running, set next turn (turn overflow is handled in that method)
-        abcd_mode_next_turn(mode_data);
+    else // if it's running, set next turn (turn overflow is handled in that method)
+    {
+        this->nextTurn();
     }
+    return true;
 }
 
-void abcd_mode_handle_sec_tick(AbcdModeData *mode_data)
+bool AbcdModeData::handleSecTick()
 {
-    if (mode_data == NULL)
-        return;
+    const bool alreadyHandledSecTick = BaseModeData::handleSecTick();
+    if (alreadyHandledSecTick)
+        return true;
 
-    BASE_MODE_HANDLE_SEC_TICK();
+    this->setCurrentTimer(&this->m_currentTime);
 
-    mode_data->base->current_timer = &mode_data->current_time;
-
-    if (base_mode_current_time(mode_data->base) == 0)
-    {
-        abcd_mode_next_turn(mode_data);
-    }
+    if (this->currentTime() == 0)
+        this->nextTurn();
+    return true;
 }
 
-void abcd_mode_next_turn(AbcdModeData *mode_data)
+void AbcdModeData::nextTurn()
 {
-    if (mode_data == NULL)
-        return;
-
-    if (mode_data->_current_turn_this_round >= mode_data->base->init_data->turns_per_round)
+    if(this->m_currentTurnThisRound >= this->initializationData().turns_per_round)
     {
-        mode_data->_current_turn_this_round = 1;
+        this->m_currentTurnThisRound = 1;
         // turn is not set, because the last one is starting in the next round
-        base_mode_set_running(mode_data->base, false);
+        this->setRunning(false);
     }
 
-    else
+    else 
     {
-        // reset prep timer
-        base_mode_restore_prep_time(mode_data->base);
-
-        mode_data->_current_turn_this_round++;
-        mode_data->current_turn = (mode_data->current_turn == AbTurn) ? CdTurn : AbTurn;
-        mode_data->current_time = mode_data->base->init_data->time_per_round;
+        this->restorePrepTimer();
+        this->m_currentTurnThisRound++;
+        this->m_currentTurn = (this->m_currentTurn == AbTurn) ?CdTurn :AbTurn;
+        this->m_currentTime = this->initializationData().time_per_round;
     }
 }
 
-void abcd_mode_print(AbcdModeData *mode_data)
+void AbcdModeData::log() const
 {
     Logging::log(
         "ABCD(time: %d s, turn: %s, running: %s, prep: %s, training: %s, round: %d)\n\r",
-        base_mode_current_time(mode_data->base),
-        (mode_data->current_turn == AbTurn) ? "AB" : "CD",
-        (base_mode_running(mode_data->base)) ? "true" : "false",
-        (base_mode_prep_time(mode_data->base)) ? "true" : "false",
-        (mode_data->base->round_info->training) ? "true" : "false",
-        mode_data->base->round_info->current_round);
+        this->currentTime(),
+        (this->m_currentTurn == AbTurn) ? "AB" : "CD",
+        (this->running()) ? "true" : "false",
+        (this->isPrepTime()) ? "true" : "false",
+        (this->roundInfo().isTraining()) ? "true" : "false",
+        this->roundInfo().currentRound());
 }
 
-void abcd_mode_display(DisplayState *display, AbcdModeData *mode_data)
+bool AbcdModeData::display(DisplayState *displayState) const
 {
-    if (display == NULL || mode_data == NULL)
-        return;
+    if (displayState == nullptr)
+        return false;
 
-    BASE_MODE_DISPLAY();
+    const bool alreadyHandledDisplay = BaseModeData::display(displayState);
+    if(alreadyHandledDisplay)
+        return true;
 
     // set time
-    sprintf(display->leftDisplay, "%3d", base_mode_current_time(mode_data->base));
+    sprintf(displayState->leftDisplay, "%3d", this->currentTime());
     // set turn
-    sprintf(display->rightDisplay, "%s",
-            (mode_data->current_turn == AbTurn) ? "AB " : "CD ");
+    sprintf(displayState->rightDisplay, "%s",
+            (this->m_currentTurn == AbTurn) ? "AB " : "CD ");
 
-    base_mode_display_semaphor(display, mode_data->base);
-    base_mode_round_display(mode_data->base, display->middleDisplay);
+    this->displaySemaphor(displayState);
+    this->displayRound(displayState->middleDisplay);
 }
 
-void abcd_mode_reset_state(AbcdModeData *mode_data, InitializationCommand *init_data)
+void AbcdModeData::resetState(InitializationCommand initData)
 {
-    base_mode_reset_state(mode_data->base, init_data);
-    mode_data->current_turn = AbTurn;
-    mode_data->_current_turn_this_round = 1;
-    mode_data->current_time = mode_data->base->init_data->time_per_round;
-}
-
-void abcd_mode_free(void **mode_data)
-{
-    AbcdModeData **casted_mode_data = (AbcdModeData **)(mode_data);
-    base_mode_free_internal(&(*casted_mode_data)->base);
-    base_mode_free(mode_data);
+    BaseModeData::resetState(initData);
+    this->m_currentTurn = AbTurn;
+    this->m_currentTurnThisRound = 1;
+    this->m_currentTime = this->initializationData().time_per_round;
 }
