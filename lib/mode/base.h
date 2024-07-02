@@ -50,7 +50,7 @@ class BaseModeData
         // TODO doc
         virtual bool nextStep();
         virtual bool handleSecTick();
-        virtual void log() const;
+        virtual void log() const = 0;
         virtual void resetState(InitializationCommand initData);
         virtual bool display(DisplayState* displayState) const;
 
