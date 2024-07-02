@@ -8,47 +8,37 @@
 #include <lib/mode/abc.h>
 #include <lib/mode/abcd.h>
 
-typedef struct
+class ModeManager
 {
-    void *mode_data;
-    AbModeData *_ab_mode_data;
-    AbcModeData *_abc_mode_data;
-    AbcdModeData *_abcd_mode_data;
-    FinalsModeData *_finals_mode_data;
-    BaseModeData *base_mode_data;
-    InitializationCommand *init_data;
-    RoundInfo *round_info;
-} ModeManager;
+    private:
+        BaseModeData* m_currentMode;
+        AbModeData m_abModeData;
+        AbcModeData m_abcModeData;
+        AbcdModeData m_abcdModeData;
+        FinalsModeData m_finalsModeData;
 
-void mode_manager_init(
-    ModeManager *mode_manager,
-    BaseModeData *base_mode_data,
-    AbModeData *ab_mode_data,
-    AbcModeData *abc_mode_data,
-    AbcdModeData *abcd_mode_data,
-    FinalsModeData *finals_mode_data,
-    InitializationCommand *init_data,
-    RoundInfo *round_info);
+    public:
+        ModeManager();
 
-/**
- * @brief mode_manager_mode_init Initialized given mode based on the intialization data.
- * @param mode_data Destination of the mode_data.
- * @param base_mode_data Destination where the base mode data will be stored.
- */
-void mode_manager_mode_init(ModeManager *mode_manager, InitializationCommand *init_data);
+        /**
+         * @brief initMode Initialized given mode based on the intialization data.
+         */
+        void initMode(InitializationCommand initData);
 
-/**
- * @brief mode_manager_mode_data_valid Checks if mode_data and base_mode_data are not null.
- * @return Returns true if both arguments are not null. Otherwise it returns false.
- */
-bool mode_manager_mode_data_valid(ModeManager *mode_manager);
+        /**
+         * @brief modeDataValid Checks if mode_data and base_mode_data are not null.
+         * @return Returns true if both arguments are not null. Otherwise it returns false.
+         */
+        bool modeDataValid() const;
 
-/**
- * @brief mode_manager_process_commands Based on the command it modifies the state of the running mode.
- * @param mode_manager Target mode manager.
- * @param command Pointer to either Command, BreakCommand or InitializationCommand. Does not free the space
- * allocated for command.
- */
-void mode_manager_process_commands(ModeManager *mode_manager, void *command);
+        /**
+         * @brief processCommand Based on the command it modifies the state of the running mode.
+         * @param command Pointer to either Command, BreakCommand or InitializationCommand. Does not free the space
+         * allocated for command.
+         */
+        void processCommand(const BaseCommand* command); 
+
+        BaseModeData* currentMode() const;
+};
 
 #endif
