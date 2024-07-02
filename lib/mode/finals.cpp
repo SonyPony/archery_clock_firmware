@@ -128,6 +128,7 @@ bool FinalsModeData::display(DisplayState *displayState) const
     // display turn
     sprintf(displayState->middleDisplay, "%s",
             (this->m_currentTurn == FinalsLeftTurn) ? "< " : " >");
+    return true;
 }
 
 void FinalsModeData::endRound()
