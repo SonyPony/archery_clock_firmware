@@ -66,6 +66,7 @@ bool AbModeData::display(DisplayState *displayState) const
 
     this->displaySemaphor(displayState);
     this->displayRound(displayState->middleDisplay);
+    
     return true;
 }
 
