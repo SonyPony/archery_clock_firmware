@@ -93,6 +93,8 @@ bool AbcdModeData::display(DisplayState *displayState) const
 
     this->displaySemaphor(displayState);
     this->displayRound(displayState->middleDisplay);
+
+    return true;
 }
 
 void AbcdModeData::resetState(InitializationCommand initData)
