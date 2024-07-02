@@ -17,6 +17,8 @@ enum TurnType
 struct BaseCommand
 {
     MessageType type;
+
+    virtual ~BaseCommand() = default;
 };
 
 struct InitializationCommand: public BaseCommand
