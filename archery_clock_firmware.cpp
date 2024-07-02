@@ -17,7 +17,7 @@
 #include <lib/mode/abcd.h>
 #include <lib/peripheral/shift_register.h>
 
-#define MESSAGE_BUFFER_SIZE 8
+#define MESSAGE_BUFFER_SIZE 128
 volatile char message_buffer_data[MESSAGE_BUFFER_SIZE];
 volatile uint32_t message_buffer_data_end_idx = 0;
 Buffer message_buffer(message_buffer_data, &message_buffer_data_end_idx, MESSAGE_BUFFER_SIZE);
@@ -30,7 +30,6 @@ AbModeData ab_mode_data;
 AbcModeData abc_mode_data;
 AbcdModeData abcd_mode_data;
 FinalsModeData finals_mode_data;
-BaseModeData base_mode_data;
 RoundInfo round_info;
 
 const uint32_t sr_clk_pin = 28;
@@ -57,33 +56,34 @@ int main()
     uart_set_irq_enables(uart0, true, false);
 
     // add message
-    //const char* msg = "<3><4>";//"<012003003ABD><6>";
-    const BaseCommand* result = nullptr;
+    const char* msg = "<012003003ABD><700120>";
     MessageType msgType;
+    
+    for(int i = 0; i < strlen(msg); i++)
+        message_buffer.addByte(msg[i]);
 
         // init display
+    display_controller.displayState()->clear();
     display_controller.display();
 
     // modes handling
-    InitializationCommand init_command;
-    mode_manager_init(&mode_manager, &base_mode_data, &ab_mode_data, &abc_mode_data, &abcd_mode_data, &finals_mode_data, &init_command, &round_info);
-
-    /*for(int i = 0; i < strlen(msg); i++)
-        message_buffer.addByte(msg[i]);*/
 
     int j = 0;
     while (true) {
-        result = msgParser.parseMessage();
+        const BaseCommand* command = msgParser.parseMessage();
         // TODO nullptr check
-        if(result != nullptr) {
-            msgType = ((BaseCommand*)result)->type;
+        if(command != nullptr) {
+            msgType = ((BaseCommand*)command)->type;
             Logging::log("Message: %s\n", messageTypeToString(msgType));
+            mode_manager.processCommand(command);
         }
         sleep_ms(1000);
+        //Logging::log("health\r\n");
 
-        if (mode_manager_mode_data_valid(&mode_manager))
+        if (mode_manager.modeDataValid())
         {
-            mode_manager.base_mode_data->display(display_controller.displayState(), mode_manager.mode_data); // set the display state
+            BaseModeData* modeData = mode_manager.currentMode();
+            modeData->display(display_controller.displayState()); // set the display state
             // TODO display on display
 
             //- LOGGING -----------------------------------------
@@ -91,10 +91,11 @@ int main()
             Logging::log("%6d: ", j);
             display_controller.displayState()->log();
             Logging::log(",  ");
-            mode_manager.base_mode_data->print(mode_manager.mode_data);
+            modeData->log();
             //---------------------------------------------------
 
-            mode_manager.base_mode_data->handle_sec_tic(mode_manager.mode_data);
+            modeData->handleSecTick();
+            //mode_manager.base_mode_data->handle_sec_tic(mode_manager.mode_data);
         }
         
         j++;
