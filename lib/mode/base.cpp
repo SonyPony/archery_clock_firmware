@@ -13,6 +13,14 @@ RoundInfo::RoundInfo(int trainingRoundsCount)
     this->m_isTraining = (trainingRoundsCount > 0);
 }
 
+int RoundInfo::currentRound() const {
+    return this->m_currentRound;
+}
+
+bool RoundInfo::isTraining() const {
+    return this->m_isTraining;
+}
+
 bool RoundInfo::isFirstCompetitionRound() const 
 {
     return this->m_currentRound == 1 && !this->m_isTraining;
