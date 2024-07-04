@@ -133,6 +133,7 @@ const BaseCommand* MessageParser::parseMessage()
 
     else if (parsed_msg_type == InitializationMessageType)
         result = this->parseInitializationCommand(msg_info, &m_initCommand);
+    result->type = parsed_msg_type;
 
     // message parsed -> remove from buffer
     this->removeMessageFromBuffer(msg_info);
