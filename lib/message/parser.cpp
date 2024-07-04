@@ -29,7 +29,7 @@ InitializationCommand* MessageParser::parseInitializationCommand(MessageInfo msg
     const uint32_t msgTurnTypeStartIdx = this->m_buffer->relativeIdx(msgContentStartIdx) + 8;
 
     msg->turn_type = ABCD_TurnType; // default value
-    msg->turns_per_round = 2;
+    msg->turns_per_round = 2;   // this parameter is omitted in AB and ABC mode.
     msg->time_per_round = this->m_buffer->parseInt(msgContentStartIdx, 3);            // 3 decimals are reserved for time per round
     msg->warning_time = this->m_buffer->parseInt(msgContentStartIdx + 3, 3);          // 3 decimals are reserved for warning time
     msg->training_rounds_count = this->m_buffer->parseInt(msgContentStartIdx + 6, 2); // 2 decimals
