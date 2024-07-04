@@ -25,8 +25,8 @@ InitializationCommand* MessageParser::parseInitializationCommand(MessageInfo msg
     if(msg == nullptr)
         return nullptr;
 
-    const uint32_t msgContentStartIdx = msgInfo.startIdx + 2; // omit id symbol (+1) and start symbol
-    const uint32_t msgTurnTypeStartIdx = msgContentStartIdx + 8;
+    const uint32_t msgContentStartIdx = this->m_buffer->relativeIdx(msgInfo.startIdx) + 2; // omit id symbol (+1) and start symbol
+    const uint32_t msgTurnTypeStartIdx = this->m_buffer->relativeIdx(msgContentStartIdx) + 8;
 
     msg->turn_type = ABCD_TurnType; // default value
     msg->turns_per_round = 2;
@@ -35,10 +35,12 @@ InitializationCommand* MessageParser::parseInitializationCommand(MessageInfo msg
     msg->training_rounds_count = this->m_buffer->parseInt(msgContentStartIdx + 6, 2); // 2 decimals
     msg->prep_time = PREP_TIME;
 
-    if (this->m_buffer->compareString(msgTurnTypeStartIdx, "AB-"))
+    if (this->m_buffer->compareString(msgTurnTypeStartIdx, "AB-")) {
         msg->turn_type = AB_TurnType;
-    else if (this->m_buffer->compareString(msgTurnTypeStartIdx, "ABC"))
+    }
+    else if (this->m_buffer->compareString(msgTurnTypeStartIdx, "ABC")) {
         msg->turn_type = ABC_TurnType;
+    }
     else if (this->m_buffer->compareString(msgTurnTypeStartIdx, "ABD"))
     {
         msg->turn_type = ABCD_TurnType;
@@ -62,7 +64,7 @@ BreakCommand* MessageParser::parseBreakCommand(MessageInfo msgInfo, BreakCommand
     if (msg == nullptr)
         return nullptr;
 
-    const uint32_t msgContentStartIdx = msgInfo.startIdx + 2; // omit id symbol (+1) + start symbol
+    const uint32_t msgContentStartIdx = this->m_buffer->relativeIdx(msgInfo.startIdx) + 2; // omit id symbol (+1) + start symbol
     msg->break_time = this->m_buffer->parseInt(msgContentStartIdx, 5);                                 // 5 decimals are reserved for break time
 
     return msg;
@@ -125,8 +127,6 @@ const BaseCommand* MessageParser::parseMessage()
 
     if(!this->checkMessageValid(msg_info, parsed_msg_type))
         return nullptr;
-
-    result->type = parsed_msg_type;
 
     if (parsed_msg_type == BreakMessageType)
         result = this->parseBreakCommand(msg_info, &m_breakCommand);
