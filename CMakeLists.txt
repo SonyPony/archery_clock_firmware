@@ -23,7 +23,7 @@ if(WIN32)
     include(${pico-sdk-tools_DIR}/pico-sdk-tools-config-version.cmake)
 endif()
 # ====================================================================================
-set(PICO_BOARD pico CACHE STRING "Board type")
+set(PICO_BOARD pico_w CACHE STRING "Board type")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
@@ -49,6 +49,7 @@ add_subdirectory(lib/logging)
 add_subdirectory(lib/message)
 add_subdirectory(lib/mode)
 add_subdirectory(lib/peripheral)
+add_subdirectory(lib/wifi)
 
 pico_set_program_name(archery_clock_firmware "archery_clock_firmware")
 pico_set_program_version(archery_clock_firmware "0.1")
@@ -71,6 +72,7 @@ target_include_directories(archery_clock_firmware PRIVATE
 target_link_libraries(archery_clock_firmware 
         hardware_timer
         hardware_clocks
+        pico_cyw43_arch_lwip_threadsafe_background
         )
 
 pico_add_extra_outputs(archery_clock_firmware)

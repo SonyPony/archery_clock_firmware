@@ -1,0 +1,1 @@
+target_sources(archery_clock_firmware PRIVATE dhcpserver.h dhcpserver.cpp)
