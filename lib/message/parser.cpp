@@ -120,7 +120,7 @@ const BaseCommand* MessageParser::parseMessage()
     const MessageInfo msg_info = this->parseMessageInfo();
     BaseCommand *result = &m_baseCommand;
 
-    if (!msg_info.valid())
+    if (!msg_info.valid())  // TODO remove message from buffer if not valid
         return nullptr;
 
     const MessageType parsed_msg_type = this->parseMessageType(msg_info);
