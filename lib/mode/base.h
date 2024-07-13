@@ -3,25 +3,8 @@
 
 #include <lib/data/commands.h>
 #include <lib/peripheral/display.h>
+#include "round_info.h"
 
-
-class RoundInfo
-{
-    private:
-        int m_trainingRoundsCount;
-        int m_currentRound;
-        bool m_isTraining;
-
-    public:
-        RoundInfo(int trainingRoundsCount = 0);
-
-        bool isTraining() const;
-        int currentRound() const;
-        bool isFirstCompetitionRound() const;
-
-        void setPreviousRound();
-        void setNextRound();
-};
 
 class BaseModeData
 {
