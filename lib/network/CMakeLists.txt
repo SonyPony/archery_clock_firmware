@@ -1,1 +1,1 @@
-target_sources(archery_clock_firmware PRIVATE dhcpserver.h dhcpserver.cpp tcp_server.h tcp_server.cpp)
+target_sources(archery_clock_firmware PRIVATE dhcpserver.h dhcpserver.cpp tcp_server.h tcp_server.cpp wifi.h wifi.cpp)
