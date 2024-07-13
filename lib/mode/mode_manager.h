@@ -2,7 +2,7 @@
 #define _MODE_MANAGER_H_
 
 #include <lib/core/buffer.h>
-#include <lib/data/data_model.h>
+#include <lib/data/commands.h>
 #include <lib/mode/finals.h>
 #include <lib/mode/ab.h>
 #include <lib/mode/abc.h>

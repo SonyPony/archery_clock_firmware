@@ -10,7 +10,7 @@
 #include <lib/message/parser.h>
 #include <lib/core/buffer.h>
 #include <string.h>
-#include <lib/data/data_model.h>
+#include <lib/data/commands.h>
 #include <lib/message/message_info.h>
 
 #include <lib/mode/mode_manager.h>

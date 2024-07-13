@@ -1,7 +1,7 @@
 #ifndef BASE_H
 #define BASE_H
 
-#include <lib/data/data_model.h>
+#include <lib/data/commands.h>
 #include <lib/peripheral/display.h>
 
 

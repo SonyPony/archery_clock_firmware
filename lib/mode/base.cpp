@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <lib/peripheral/display.h>
-#include <lib/data/data_model.h>
+#include <lib/data/commands.h>
 #include <lib/logging/logging.h>
 
 

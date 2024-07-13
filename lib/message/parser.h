@@ -3,7 +3,7 @@
 
 #include "message_info.h"
 #include <lib/core/buffer.h>
-#include <lib/data/data_model.h>
+#include <lib/data/commands.h>
 
 #define MESSAGE_START_SYMBOL '<'
 #define MESSAGE_END_SYMBOL '>'

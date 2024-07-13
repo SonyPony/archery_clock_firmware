@@ -2,7 +2,7 @@
 #define AB_H
 
 #include <lib/mode/base.h>
-#include <lib/data/data_model.h>
+#include <lib/data/commands.h>
 
 class AbModeData: public BaseModeData
 {

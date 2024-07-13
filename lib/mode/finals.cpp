@@ -1,7 +1,7 @@
 #include "finals.h"
 #include <stdlib.h>
 #include <stdio.h> // TODO delete
-#include <lib/data/data_model.h>
+#include <lib/data/commands.h>
 #include <lib/logging/logging.h>
 
 FinalsModeData::FinalsModeData(): BaseModeData()

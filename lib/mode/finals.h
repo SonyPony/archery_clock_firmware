@@ -1,7 +1,7 @@
 #ifndef FINALS_H
 #define FINALS_H
 
-#include <lib/data/data_model.h>
+#include <lib/data/commands.h>
 #include <lib/mode/base.h>
 
 enum FinalsTurns
