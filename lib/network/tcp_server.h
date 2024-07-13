@@ -44,6 +44,7 @@ class TCPServer
 
         TCPEndpointInfo* serverInfo() const;
 
+        // TODO send message
         std::function<void(TCPClientInfo*, tcp_pcb_t*, u16_t)> sentHandler;
         std::function<void(TCPClientInfo*, tcp_pcb_t*, pbuf_t*, err_t)> recvHandler;
         std::function<err_t(TCPClientInfo*, tcp_pcb_t*)> pollHandler;
