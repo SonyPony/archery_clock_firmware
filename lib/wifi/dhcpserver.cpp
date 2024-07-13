@@ -181,7 +181,7 @@ static void opt_write_u32(uint8_t **opt, uint8_t cmd, uint32_t val) {
 }
 
 static void dhcp_server_process(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *src_addr, u16_t src_port) {
-    dhcp_server_t *d = (dhcp_server_t*)arg;
+    DHCPServer *d = reinterpret_cast<DHCPServer*>(arg);
     (void)upcb;
     (void)src_addr;
     (void)src_port;
@@ -300,16 +300,16 @@ static void dhcp_server_process(void *arg, struct udp_pcb *upcb, struct pbuf *p,
     dhcp_socket_sendto(&d->udp, nif, &dhcp_msg, opt - (uint8_t *)&dhcp_msg, 0xffffffff, PORT_DHCP_CLIENT);
 }
 
-void dhcp_server_init(dhcp_server_t *d, ip_addr_t *ip, ip_addr_t *nm) {
-    ip_addr_copy(d->ip, *ip);
-    ip_addr_copy(d->nm, *nm);
-    memset(d->lease, 0, sizeof(d->lease));
-    if (dhcp_socket_new_dgram(&d->udp, d, dhcp_server_process) != 0) {
+DHCPServer::DHCPServer(ip_addr_t *ip, ip_addr_t *nm) {
+    ip_addr_copy(this->ip, *ip);
+    ip_addr_copy(this->nm, *nm);
+    memset(this->lease, 0, sizeof(this->lease));
+    if (dhcp_socket_new_dgram(&this->udp, this, dhcp_server_process) != 0) {
         return;
     }
-    dhcp_socket_bind(&d->udp, PORT_DHCP_SERVER);
+    dhcp_socket_bind(&this->udp, PORT_DHCP_SERVER);
 }
 
-void dhcp_server_deinit(dhcp_server_t *d) {
-    dhcp_socket_free(&d->udp);
+DHCPServer::~DHCPServer() {
+    dhcp_socket_free(&this->udp);
 }
