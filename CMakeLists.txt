@@ -49,7 +49,7 @@ add_subdirectory(lib/logging)
 add_subdirectory(lib/message)
 add_subdirectory(lib/mode)
 add_subdirectory(lib/peripheral)
-add_subdirectory(lib/wifi)
+add_subdirectory(lib/network)
 
 pico_set_program_name(archery_clock_firmware "archery_clock_firmware")
 pico_set_program_version(archery_clock_firmware "0.1")
