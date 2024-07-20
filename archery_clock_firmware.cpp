@@ -16,10 +16,9 @@
 #include <lib/mode/mode_manager.h>
 #include <lib/peripheral/shift_register.h>
 
-
 // definitions fow wifi
-constexpr const char* SSID_NAME = "picow_test";
-constexpr const char* PASSWORD = "password";
+constexpr const char *SSID_NAME = "picow_test";
+constexpr const char *PASSWORD = "password";
 
 // definitions for message buffer
 constexpr uint32_t MESSAGE_BUFFER_SIZE = 128;
@@ -31,7 +30,6 @@ Buffer messageBuffer(messageBufferData, &messageBufferDataEndIdx, MESSAGE_BUFFER
 constexpr uint32_t SR_CLK_PIN = 28;
 constexpr uint32_t SR_DATA_PIN = 27;
 constexpr uint32_t SR_CS_PIN = 26;
-
 
 static void recvHandler(TCPClientInfo *clientInfo, tcp_pcb_t *clientPcb, pbuf_t *buffer, err_t err)
 {
@@ -76,6 +74,13 @@ int main()
     ShiftRegister shiftRegister(SR_CLK_PIN, SR_DATA_PIN, SR_CS_PIN);
     DisplayController displayController(&shiftRegister);
 
+    modeManager.roundChangeCallback = [&tcpServer](RoundInfo roundInfo) -> void
+    {
+        RoundChangeCommandInfo command(roundInfo);
+        tcpServer.send(command.toBytes(), command.bytesCount());
+        Logging::log(LoggingLevel::Debug, "Round: %s\n", command.toBytes());
+    };
+
     // init display
     displayController.displayState()->clear();
     displayController.display();
@@ -88,17 +93,21 @@ int main()
 
     while (true)
     {
-        const BaseCommand* command = msgParser.parseMessage();
-        if(command != nullptr) {
-            const MessageType msgType = ((BaseCommand*)command)->type;
-            Logging::log("Message: %s\n", messageTypeToString(msgType));
-            modeManager.processCommand(command);
+        for (int i = 0; i < 20; i++)
+        {
+            const BaseCommand *command = msgParser.parseMessage();
+            if (command != nullptr)
+            {
+                const MessageType msgType = ((BaseCommand *)command)->type;
+                Logging::log("Message: %s\n", messageTypeToString(msgType));
+                modeManager.processCommand(command);
+            }
+            sleep_ms(50);
         }
-        sleep_ms(1000);
 
         if (modeManager.modeDataValid())
         {
-            BaseModeData* modeData = modeManager.currentMode();
+            BaseModeData *modeData = modeManager.currentMode();
             modeData->display(displayController.displayState()); // set the display state
             // TODO display on display
 
