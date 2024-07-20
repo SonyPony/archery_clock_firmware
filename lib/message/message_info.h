@@ -11,9 +11,11 @@ enum MessageType
     PauseMessageType = 5,
     NextStepMessageType = 6,
     BreakMessageType = 7,
-    StateMessageType = 'a',
+    PauseStateMessageType = 'a',
     RoundChangeMessageType = 'b',
-    InvalidMessageType = 255,
+    TimerChangeMessageType = 'c',
+    CurrentStateInfoMessageType = 'd',
+    InvalidMessageType = 127,
 };
 
 const char* messageTypeToString(MessageType msgType);
