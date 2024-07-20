@@ -29,22 +29,23 @@ class TCPServer
     private:
         TCPEndpointInfo* m_serverInfo;
         uint16_t m_port;
-        std::vector<tcp_pcb_t*> m_clients;
+        std::vector<TCPClientInfo*> m_clients;
 
     public:
         TCPServer(uint16_t port);
         ~TCPServer();
 
-        void addClient(tcp_pcb_t* clientPcb);
-        void removeClient(tcp_pcb_t* clientPcb);
+        void addClient(TCPClientInfo* clientPcb);
+        void removeClient(TCPClientInfo* clientPcb);
         bool start();
         void stop();
         uint32_t pollTime() const;
-        err_t disconnectClient(TCPClientInfo* clientInfo ,tcp_pcb_t* clientPcb);
+        err_t disconnectClient(TCPClientInfo* clientInfo);
 
         TCPEndpointInfo* serverInfo() const;
 
-        // TODO send message
+        void send(const char* data, uint32_t bytesCount);
+        
         std::function<void(TCPClientInfo*, tcp_pcb_t*, u16_t)> sentHandler;
         std::function<void(TCPClientInfo*, tcp_pcb_t*, pbuf_t*, err_t)> recvHandler;
         std::function<err_t(TCPClientInfo*, tcp_pcb_t*)> pollHandler;

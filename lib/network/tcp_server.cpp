@@ -1,7 +1,6 @@
 #include "tcp_server.h"
 #include <lib/logging/logging.h>
 
-
 static err_t serverSent(void *arg, struct tcp_pcb *pcb, u16_t len)
 {
     TCPClientInfo *clientInfo = reinterpret_cast<TCPClientInfo *>(arg);
@@ -22,7 +21,7 @@ err_t serverRecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t err)
     if (p == nullptr)
     {
         Logging::log(LoggingLevel::Error, "Invalid buffer.\n");
-        return clientInfo->server->disconnectClient(clientInfo, pcb);
+        return clientInfo->server->disconnectClient(clientInfo);
     }
     assert(clientInfo != nullptr && clientInfo->pcb == pcb);
     if (p->tot_len > 0)
@@ -56,7 +55,7 @@ static void serverErr(void *arg, err_t err)
     if (err != ERR_ABRT)
     {
         Logging::log(LoggingLevel::Error, "TCP error %d.\n", err);
-        clientInfo->server->disconnectClient(clientInfo, clientInfo->pcb);
+        clientInfo->server->disconnectClient(clientInfo);
     }
 }
 
@@ -96,11 +95,15 @@ void TCPServer::stop()
     }
 }
 
-err_t TCPServer::disconnectClient(TCPClientInfo *clientInfo, tcp_pcb_t *clientPcb)
+err_t TCPServer::disconnectClient(TCPClientInfo *clientInfo)
 {
+    this->removeClient(clientInfo);
+    if (clientInfo == nullptr)
+        return ERR_OK;
+
+    tcp_pcb_t *clientPcb = clientInfo->pcb;
     if (clientPcb == nullptr)
         return ERR_OK;
-    assert(clientInfo != nullptr && clientInfo->pcb == clientPcb);
 
     tcp_arg(clientPcb, nullptr);
     tcp_poll(clientPcb, nullptr, 0);
@@ -127,12 +130,12 @@ TCPEndpointInfo *TCPServer::serverInfo() const
     return this->m_serverInfo;
 }
 
-void TCPServer::addClient(tcp_pcb_t *clientPcb)
+void TCPServer::addClient(TCPClientInfo *clientPcb)
 {
     this->m_clients.push_back(clientPcb);
 }
 
-void TCPServer::removeClient(tcp_pcb_t *clientPcb)
+void TCPServer::removeClient(TCPClientInfo *clientPcb)
 {
     for (int i = 0; i < this->m_clients.size(); i++)
     {
@@ -163,9 +166,10 @@ static err_t acceptClient(void *arg, struct tcp_pcb *clientPcb, err_t err)
     // add pcb to server
     TCPClientInfo *clientInfo = new TCPClientInfo;
     clientInfo->pcb = clientPcb;
+    tcp_nagle_disable(clientPcb);
     clientInfo->server = tcpServer;
 
-    tcpServer->addClient(clientPcb);
+    tcpServer->addClient(clientInfo);
 
     // setup connection to client
     tcp_arg(clientPcb, clientInfo);
@@ -214,4 +218,22 @@ bool TCPServer::start()
     tcp_arg(this->m_serverInfo->pcb, this);
     tcp_accept(this->m_serverInfo->pcb, acceptClient);
     return true;
+}
+
+void TCPServer::send(const char *data, uint32_t bytesCount)
+{
+    std::vector<int> clientsToDisconnect;
+
+    for (int idx = this->m_clients.size() - 1; idx >= 0; idx--)
+    {
+        TCPClientInfo *clientInfo = this->m_clients[idx];
+        err_t err = tcp_write(clientInfo->pcb, data, bytesCount, 0);
+        if (err != ERR_OK)
+        {
+            Logging::log(LoggingLevel::Error, "Failed to write result data %d.\n", err);
+            this->disconnectClient(clientInfo);
+        }
+    }
+
+    // close failed clients
 }
