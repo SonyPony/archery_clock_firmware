@@ -5,6 +5,7 @@
 
 ModeManager::ModeManager() {
     m_currentMode = nullptr;
+    this->roundChangeCallback = nullptr;
 }
 
 void ModeManager::initMode(InitializationCommand initData) {
@@ -33,6 +34,7 @@ void ModeManager::initMode(InitializationCommand initData) {
     } 
 
     if(this->m_currentMode != nullptr) {
+        this->m_currentMode->roundChangeCallback = this->roundChangeCallback;
         this->m_currentMode->resetState(initData);
     }
 }

@@ -7,6 +7,7 @@
 #include <lib/mode/ab.h>
 #include <lib/mode/abc.h>
 #include <lib/mode/abcd.h>
+#include <functional>
 
 class ModeManager
 {
@@ -39,6 +40,7 @@ class ModeManager
         void processCommand(const BaseCommand* command); 
 
         BaseModeData* currentMode() const;
+        std::function<void(RoundInfo)> roundChangeCallback; 
 };
 
 #endif

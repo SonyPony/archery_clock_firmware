@@ -17,6 +17,8 @@ class RoundInfo
 
         void setPreviousRound();
         void setNextRound();
+
+        bool operator==(const RoundInfo& other) const;
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include <lib/data/commands.h>
 #include <lib/peripheral/display.h>
 #include "round_info.h"
+#include <functional>
 
 
 class BaseModeData
@@ -26,6 +27,7 @@ class BaseModeData
         void displayBreak(DisplayState* displayState) const;
 
     public:
+        std::function<void(RoundInfo)> roundChangeCallback; 
         BaseModeData();
 
         void restorePrepTimer();

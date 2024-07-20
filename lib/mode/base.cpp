@@ -8,6 +8,7 @@
 
 BaseModeData::BaseModeData() {
     this->m_currentTimer = nullptr;
+    this->roundChangeCallback = nullptr;
 }
 
 void BaseModeData::resetState(InitializationCommand initData) {
@@ -65,10 +66,16 @@ void BaseModeData::setCurrentTimer(int* newTimer) {
 
 void BaseModeData::setNextRound() {
     this->m_roundInfo.setNextRound();
+    if(this->roundChangeCallback != nullptr) {
+        this->roundChangeCallback(this->m_roundInfo);
+    }
 }
 
 void BaseModeData::setPreviousRound() {
     this->m_roundInfo.setPreviousRound();
+    if(this->roundChangeCallback != nullptr) {
+        this->roundChangeCallback(this->m_roundInfo);
+    }
 }
 
 void BaseModeData::displayRound(char *targetBuffer) const

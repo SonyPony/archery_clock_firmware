@@ -1,5 +1,6 @@
 #include "round_info.h"
 
+
 RoundInfo::RoundInfo(int trainingRoundsCount)
 {
     this->m_trainingRoundsCount = trainingRoundsCount;
@@ -50,4 +51,11 @@ void RoundInfo::setNextRound()
     // handle maximum number of rounds (99)
     if (this->m_currentRound > 99)
         this->m_currentRound = 99;
+}
+
+bool RoundInfo::operator==(const RoundInfo& other) const
+{
+    return this->m_trainingRoundsCount == other.m_trainingRoundsCount \
+        && this->m_currentRound == other.m_currentRound \
+        && this->m_isTraining == other.m_isTraining;
 }

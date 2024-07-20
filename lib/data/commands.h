@@ -2,6 +2,8 @@
 #define DATA_MODEL_H
 
 #include <lib/message/message_info.h>
+#include <lib/mode/round_info.h>
+#include <cstdint>
 
 #define PREP_TIME 10    // in seconds
 
@@ -19,6 +21,8 @@ struct BaseCommand
     MessageType type;
 
     virtual ~BaseCommand() = default;
+    virtual const char* toBytes() { return nullptr; }
+    virtual uint32_t bytesCount() const { return 0; }
 };
 
 struct InitializationCommand: public BaseCommand
@@ -34,6 +38,21 @@ struct InitializationCommand: public BaseCommand
 struct BreakCommand: public BaseCommand
 {
     int break_time;
+};
+
+struct RoundChangeCommandInfo: public BaseCommand
+{
+    // <a{1:isTraining}{2:round}> -> 6 len
+    private:
+        static constexpr uint32_t m_messageLen = 6;
+        char m_buffer[m_messageLen + 1];
+        RoundInfo m_roundInfo;
+
+    public:
+        RoundChangeCommandInfo(RoundInfo roundInfo);
+
+        const char* toBytes() override;
+        uint32_t bytesCount() const override;
 };
 
 #endif // RUN_DATA_H
