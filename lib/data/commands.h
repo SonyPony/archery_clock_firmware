@@ -14,6 +14,7 @@ enum TurnType
     ABCD_TurnType,
     FinalsTeams_TurnType,
     FinalsIndividual_TurnType,
+    None_TurnType,
 };
 
 struct BaseCommand
@@ -42,7 +43,7 @@ struct BreakCommand: public BaseCommand
 
 struct RoundChangeCommandInfo: public BaseCommand
 {
-    // <a{1:isTraining}{2:round}> -> 6 len
+    // <b{1:isTraining}{2:round}> -> 6 len
     private:
         static constexpr uint32_t m_messageLen = 6;
         char m_buffer[m_messageLen + 1];
@@ -50,6 +51,21 @@ struct RoundChangeCommandInfo: public BaseCommand
 
     public:
         RoundChangeCommandInfo(RoundInfo roundInfo);
+
+        const char* toBytes() override;
+        uint32_t bytesCount() const override;
+};
+
+struct ModeChangeCommandInfo: public BaseCommand
+{
+    // <d<AB- | ABC | ABD | F-I | F-T | ---> 6 -> len
+    private:
+        static constexpr uint32_t m_messageLen = 6;
+        char m_buffer[m_messageLen + 1];
+        TurnType m_modeType;
+
+    public:
+        ModeChangeCommandInfo(TurnType modeType);
 
         const char* toBytes() override;
         uint32_t bytesCount() const override;

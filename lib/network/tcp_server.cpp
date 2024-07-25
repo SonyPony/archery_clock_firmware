@@ -61,6 +61,7 @@ static void serverErr(void *arg, err_t err)
 
 TCPServer::TCPServer(uint16_t port)
 {
+    this->newClientCallback = nullptr;
     this->m_port = port;
     this->m_serverInfo = new TCPEndpointInfo;
     this->sentHandler = nullptr;
@@ -178,6 +179,10 @@ static err_t acceptClient(void *arg, struct tcp_pcb *clientPcb, err_t err)
     tcp_poll(clientPcb, serverPoll, tcpServer->pollTime() * 2);
     tcp_err(clientPcb, serverErr);
 
+    if(tcpServer->newClientCallback != nullptr) {
+        tcpServer->newClientCallback(clientInfo);
+    }
+
     return ERR_OK;
 }
 
@@ -220,20 +225,24 @@ bool TCPServer::start()
     return true;
 }
 
+void TCPServer::send(TCPClientInfo* clientInfo, const char *data, uint32_t bytesCount)
+{
+    if(clientInfo == nullptr)
+        return;
+
+    err_t err = tcp_write(clientInfo->pcb, data, bytesCount, 0);
+    if (err != ERR_OK)
+    {
+        Logging::log(LoggingLevel::Error, "Failed to write result data %d.\n", err);
+        this->disconnectClient(clientInfo);
+    }
+}
+
 void TCPServer::send(const char *data, uint32_t bytesCount)
 {
-    std::vector<int> clientsToDisconnect;
-
     for (int idx = this->m_clients.size() - 1; idx >= 0; idx--)
     {
         TCPClientInfo *clientInfo = this->m_clients[idx];
-        err_t err = tcp_write(clientInfo->pcb, data, bytesCount, 0);
-        if (err != ERR_OK)
-        {
-            Logging::log(LoggingLevel::Error, "Failed to write result data %d.\n", err);
-            this->disconnectClient(clientInfo);
-        }
+        this->send(clientInfo, data, bytesCount);
     }
-
-    // close failed clients
 }

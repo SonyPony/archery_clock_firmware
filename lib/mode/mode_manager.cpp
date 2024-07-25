@@ -6,26 +6,30 @@
 ModeManager::ModeManager() {
     m_currentMode = nullptr;
     this->roundChangeCallback = nullptr;
+    this->modeChangeCallback = nullptr;
+    this->m_currentModeType = TurnType::None_TurnType;
 }
 
 void ModeManager::initMode(InitializationCommand initData) {
     this->m_currentMode = nullptr;
+    this->m_currentModeType = TurnType::None_TurnType;
+
     switch (initData.turn_type)
     {
-    case AB_TurnType:
+    case TurnType::AB_TurnType:
         this->m_currentMode = &this->m_abModeData;
         break;
 
-    case ABC_TurnType:
+    case TurnType::ABC_TurnType:
         this->m_currentMode = &this->m_abcModeData;
         break;
 
-    case ABCD_TurnType:
+    case TurnType::ABCD_TurnType:
         this->m_currentMode = &this->m_abcdModeData;
         break;
 
-    case FinalsIndividual_TurnType:
-    case FinalsTeams_TurnType:
+    case TurnType::FinalsIndividual_TurnType:
+    case TurnType::FinalsTeams_TurnType:
         this->m_currentMode = &this->m_finalsModeData;
         break;
 
@@ -34,9 +38,19 @@ void ModeManager::initMode(InitializationCommand initData) {
     } 
 
     if(this->m_currentMode != nullptr) {
+        this->m_currentModeType = initData.turn_type;
         this->m_currentMode->roundChangeCallback = this->roundChangeCallback;
         this->m_currentMode->resetState(initData);
     }
+
+    if(this->modeChangeCallback != nullptr) {
+        this->modeChangeCallback(this->currentModeType());
+    }
+}
+
+TurnType ModeManager::currentModeType() const
+{
+    return this->m_currentModeType;
 }
 
 bool ModeManager::modeDataValid() const

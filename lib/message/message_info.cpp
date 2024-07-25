@@ -20,8 +20,8 @@ const char* messageTypeToString(MessageType msgType) {
         return "NextStepMessageType";
     case BreakMessageType:
         return "BreakMessageType";
-    case CurrentStateInfoMessageType:
-        return "CurrentStateInfoMessageType";
+    case CurrentModeChangeMessageType:
+        return "CurrentModeChangeMessageType";
     case RoundChangeMessageType:
         return "RoundChangeMessageType";
     case InvalidMessageType:

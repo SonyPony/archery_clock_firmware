@@ -74,11 +74,25 @@ int main()
     ShiftRegister shiftRegister(SR_CLK_PIN, SR_DATA_PIN, SR_CS_PIN);
     DisplayController displayController(&shiftRegister);
 
+    tcpServer.newClientCallback = [&tcpServer, &modeManager](TCPClientInfo* newClient) -> void {
+        const TurnType modeType = modeManager.currentModeType();
+        ModeChangeCommandInfo command(modeType);
+        tcpServer.send(command.toBytes(), command.bytesCount());
+        Logging::log(LoggingLevel::Debug, "Mode: %s\n", command.toBytes());
+    };
+
     modeManager.roundChangeCallback = [&tcpServer](RoundInfo roundInfo) -> void
     {
         RoundChangeCommandInfo command(roundInfo);
         tcpServer.send(command.toBytes(), command.bytesCount());
         Logging::log(LoggingLevel::Debug, "Round: %s\n", command.toBytes());
+    };
+
+    modeManager.modeChangeCallback = [&tcpServer](TurnType mode) -> void
+    {
+        ModeChangeCommandInfo command(mode);
+        tcpServer.send(command.toBytes(), command.bytesCount());
+        Logging::log(LoggingLevel::Debug, "Mode: %s\n", command.toBytes());
     };
 
     // init display

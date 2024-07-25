@@ -14,7 +14,7 @@ enum MessageType
     PauseStateMessageType = 'a',
     RoundChangeMessageType = 'b',
     TimerChangeMessageType = 'c',
-    CurrentStateInfoMessageType = 'd',
+    CurrentModeChangeMessageType = 'd',
     InvalidMessageType = 127,
 };
 

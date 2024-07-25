@@ -12,6 +12,7 @@
 class ModeManager
 {
     private:
+        TurnType m_currentModeType;
         BaseModeData* m_currentMode;
         AbModeData m_abModeData;
         AbcModeData m_abcModeData;
@@ -40,6 +41,8 @@ class ModeManager
         void processCommand(const BaseCommand* command); 
 
         BaseModeData* currentMode() const;
+        TurnType currentModeType() const;
+        std::function<void(TurnType)> modeChangeCallback;
         std::function<void(RoundInfo)> roundChangeCallback; 
 };
 
