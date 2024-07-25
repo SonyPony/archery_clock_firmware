@@ -75,24 +75,23 @@ int main()
     DisplayController displayController(&shiftRegister);
 
     tcpServer.newClientCallback = [&tcpServer, &modeManager](TCPClientInfo* newClient) -> void {
-        const TurnType modeType = modeManager.currentModeType();
-        ModeChangeCommandInfo command(modeType);
-        tcpServer.send(command.toBytes(), command.bytesCount());
-        Logging::log(LoggingLevel::Debug, "Mode: %s\n", command.toBytes());
+        tcpServer.send(ModeChangeCommandInfo(modeManager.currentModeType()));
+
+        const BaseModeData* currentMode = modeManager.currentMode();
+        if(currentMode == nullptr)
+            return;
+        
+        tcpServer.send(RoundChangeCommandInfo(currentMode->roundInfo()));
     };
 
     modeManager.roundChangeCallback = [&tcpServer](RoundInfo roundInfo) -> void
     {
-        RoundChangeCommandInfo command(roundInfo);
-        tcpServer.send(command.toBytes(), command.bytesCount());
-        Logging::log(LoggingLevel::Debug, "Round: %s\n", command.toBytes());
+        tcpServer.send(RoundChangeCommandInfo(roundInfo));
     };
 
     modeManager.modeChangeCallback = [&tcpServer](TurnType mode) -> void
     {
-        ModeChangeCommandInfo command(mode);
-        tcpServer.send(command.toBytes(), command.bytesCount());
-        Logging::log(LoggingLevel::Debug, "Mode: %s\n", command.toBytes());
+        tcpServer.send(ModeChangeCommandInfo(mode));
     };
 
     // init display

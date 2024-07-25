@@ -246,3 +246,8 @@ void TCPServer::send(const char *data, uint32_t bytesCount)
         this->send(clientInfo, data, bytesCount);
     }
 }
+
+void TCPServer::send(BaseCommand command)
+{
+    this->send(command.toBytes(), command.bytesCount());
+}
