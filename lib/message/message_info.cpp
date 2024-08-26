@@ -24,6 +24,8 @@ const char* messageTypeToString(MessageType msgType) {
         return "CurrentModeChangeMessageType";
     case RoundChangeMessageType:
         return "RoundChangeMessageType";
+    case PauseChangeMessageType:
+        return "PauseChangeMessageType";
     case InvalidMessageType:
         return "InvalidMessageType";
     }

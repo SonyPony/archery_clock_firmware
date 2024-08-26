@@ -7,6 +7,7 @@ ModeManager::ModeManager() {
     m_currentMode = nullptr;
     this->roundChangeCallback = nullptr;
     this->modeChangeCallback = nullptr;
+    this->pauseChangeCallback = nullptr;
     this->m_currentModeType = TurnType::None_TurnType;
 }
 
@@ -40,6 +41,7 @@ void ModeManager::initMode(InitializationCommand initData) {
     if(this->m_currentMode != nullptr) {
         this->m_currentModeType = initData.turn_type;
         this->m_currentMode->roundChangeCallback = this->roundChangeCallback;
+        this->m_currentMode->pausedChangeCallback = this->pauseChangeCallback;
         this->m_currentMode->resetState(initData);
     }
 
@@ -97,7 +99,10 @@ void ModeManager::processCommand(const BaseCommand* command)
             break;
 
         case PauseMessageType:
-            modeData->pause();
+            if(!modeData->paused())
+                modeData->pause();
+            else
+                modeData->resume();
             break;
 
         case BreakMessageType:

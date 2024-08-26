@@ -55,3 +55,22 @@ const char* ModeChangeCommandInfo::toBytes()
 
     return this->m_buffer;
 }
+
+PauseChangeCommandInfo::PauseChangeCommandInfo(bool paused) 
+{
+    this->m_paused = paused;
+}
+
+uint32_t PauseChangeCommandInfo::bytesCount() const 
+{
+    return PauseChangeCommandInfo::m_messageLen;
+}
+
+const char* PauseChangeCommandInfo::toBytes() 
+{
+    this->m_buffer[0] = '<';
+    this->m_buffer[1] = static_cast<char>(MessageType::PauseChangeMessageType);
+    this->m_buffer[2] = (this->m_paused) ?'1' :'0'; 
+    this->m_buffer[3] = '>';
+    this->m_buffer[4] = '\0';
+}

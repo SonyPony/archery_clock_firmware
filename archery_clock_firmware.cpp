@@ -49,7 +49,7 @@ static void recvHandler(TCPClientInfo *clientInfo, tcp_pcb_t *clientPcb, pbuf_t 
 int main()
 {
     stdio_init_all();
-
+    // TODO abstract into app
     // setup network
     if (!WiFi::startAP(SSID_NAME, PASSWORD))
     {
@@ -82,6 +82,7 @@ int main()
             return;
         
         tcpServer.send(RoundChangeCommandInfo(currentMode->roundInfo()));
+        tcpServer.send(PauseChangeCommandInfo(currentMode->paused()));
     };
 
     modeManager.roundChangeCallback = [&tcpServer](RoundInfo roundInfo) -> void
@@ -92,6 +93,11 @@ int main()
     modeManager.modeChangeCallback = [&tcpServer](TurnType mode) -> void
     {
         tcpServer.send(ModeChangeCommandInfo(mode));
+    };
+
+    modeManager.pausedChangeCallback = [&tcpServer](bool paused) -> void
+    {
+        tcpServer.send(PauseChangeCommandInfo(paused));
     };
 
     // init display

@@ -9,6 +9,7 @@
 BaseModeData::BaseModeData() {
     this->m_currentTimer = nullptr;
     this->roundChangeCallback = nullptr;
+    this->pausedChangeCallback = nullptr;
 }
 
 void BaseModeData::resetState(InitializationCommand initData) {
@@ -133,12 +134,18 @@ void BaseModeData::pause()
 {
     this->m_paused = true;
     this->m_running = false;
+
+    if(this->pausedChangeCallback != nullptr)
+        this->pausedChangeCallback(this->paused());
 }
 
 void BaseModeData::resume()
 {
     this->m_paused = false;
     this->m_running = true;
+
+    if(this->pausedChangeCallback != nullptr)
+        this->pausedChangeCallback(this->paused());
 }
 
 void BaseModeData::startBreak(int breakTime)
@@ -209,4 +216,9 @@ RoundInfo BaseModeData::roundInfo() const {
 
 bool BaseModeData::isBreak() const {
     return this->m_isBreak;
+}
+
+bool BaseModeData::paused() const
+{
+    return this->m_paused;
 }

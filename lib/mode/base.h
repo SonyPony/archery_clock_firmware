@@ -28,6 +28,7 @@ class BaseModeData
 
     public:
         std::function<void(RoundInfo)> roundChangeCallback; 
+        std::function<void(bool)> pausedChangeCallback; 
         BaseModeData();
 
         void restorePrepTimer();
@@ -55,6 +56,7 @@ class BaseModeData
         void decrementCurrentTime();
         void setCurrentTimer(int* newTimer);
 
+        bool paused() const;
         bool running() const;
         int currentTime() const;
         bool isPrepTime() const;
