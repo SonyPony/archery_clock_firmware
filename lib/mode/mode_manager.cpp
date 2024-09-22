@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <lib/message/parser.h>
 #include <string.h>
+#include <lib/logging/logging.h>
 
 ModeManager::ModeManager() {
     m_currentMode = nullptr;
@@ -14,7 +15,6 @@ ModeManager::ModeManager() {
 void ModeManager::initMode(InitializationCommand initData) {
     this->m_currentMode = nullptr;
     this->m_currentModeData = initData;
-    this->m_currentModeData.turn_type = TurnType::None_TurnType;
 
     switch (initData.turn_type)
     {
@@ -36,6 +36,7 @@ void ModeManager::initMode(InitializationCommand initData) {
         break;
 
     default:
+        this->m_currentModeData.turn_type = TurnType::None_TurnType;
         break;
     } 
 
