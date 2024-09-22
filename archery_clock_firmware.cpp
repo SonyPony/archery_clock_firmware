@@ -75,29 +75,36 @@ int main()
     DisplayController displayController(&shiftRegister);
 
     tcpServer.newClientCallback = [&tcpServer, &modeManager](TCPClientInfo* newClient) -> void {
-        tcpServer.send(ModeChangeCommandInfo(modeManager.currentModeType()));
+        ModeChangeCommandInfo modeChangeInfo(modeManager.currentModeData());
+        tcpServer.send(newClient, modeChangeInfo);
 
         const BaseModeData* currentMode = modeManager.currentMode();
         if(currentMode == nullptr)
             return;
         
-        tcpServer.send(RoundChangeCommandInfo(currentMode->roundInfo()));
-        tcpServer.send(PauseChangeCommandInfo(currentMode->paused()));
+        RoundChangeCommandInfo roundChangeInfo(currentMode->roundInfo());
+        PauseChangeCommandInfo pauseChangeInfo(currentMode->paused());
+        
+        tcpServer.send(newClient, roundChangeInfo);
+        tcpServer.send(newClient, pauseChangeInfo);
     };
 
     modeManager.roundChangeCallback = [&tcpServer](RoundInfo roundInfo) -> void
     {
-        tcpServer.send(RoundChangeCommandInfo(roundInfo));
+        RoundChangeCommandInfo roundChangeInfo(roundInfo);
+        tcpServer.send(roundChangeInfo);
     };
 
-    modeManager.modeChangeCallback = [&tcpServer](TurnType mode) -> void
+    modeManager.modeChangeCallback = [&tcpServer](InitializationCommand initData) -> void
     {
-        tcpServer.send(ModeChangeCommandInfo(mode));
+        ModeChangeCommandInfo modeChangeInfo(initData);
+        tcpServer.send(modeChangeInfo);
     };
 
     modeManager.pausedChangeCallback = [&tcpServer](bool paused) -> void
     {
-        tcpServer.send(PauseChangeCommandInfo(paused));
+        PauseChangeCommandInfo pauseChangeInfo(paused);
+        tcpServer.send(pauseChangeInfo);
     };
 
     // init display

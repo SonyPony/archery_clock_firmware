@@ -1,5 +1,6 @@
 #include "tcp_server.h"
 #include <lib/logging/logging.h>
+#include <lib/data/commands.h>
 
 static err_t serverSent(void *arg, struct tcp_pcb *pcb, u16_t len)
 {
@@ -247,7 +248,12 @@ void TCPServer::send(const char *data, uint32_t bytesCount)
     }
 }
 
-void TCPServer::send(BaseCommand command)
+void TCPServer::send(BaseCommand& command)
 {
     this->send(command.toBytes(), command.bytesCount());
+}
+
+void TCPServer::send(TCPClientInfo* clientInfo, BaseCommand& command) 
+{
+    this->send(clientInfo, command.toBytes(), command.bytesCount());
 }

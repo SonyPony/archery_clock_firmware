@@ -6,6 +6,8 @@
 #include <cstdint>
 
 #define PREP_TIME 10    // in seconds
+#define MESSAGE_START_SYMBOL '<'
+#define MESSAGE_END_SYMBOL '>'
 
 enum TurnType
 {
@@ -34,6 +36,8 @@ struct InitializationCommand: public BaseCommand
     TurnType turn_type;
     int prep_time;
     int turns_per_round; // A -> B -> A -> B -> ROUND 2 -> 2 turns per round;
+
+    InitializationCommand();
 };
 
 struct BreakCommand: public BaseCommand
@@ -56,16 +60,30 @@ struct RoundChangeCommandInfo: public BaseCommand
         uint32_t bytesCount() const override;
 };
 
-struct ModeChangeCommandInfo: public BaseCommand
+struct ModeChangeCommandInfo: public InitializationCommand
 {
-    // <d<AB- | ABC | ABD | F-I | F-T | ---> 6 -> len
+    // <d<{3:time_per_round}{3:warning_time}{2:training_rounds_count}[AB- | ABC | ABD | F-I | F-T | ---]> 6+8 -> len
     private:
-        static constexpr uint32_t m_messageLen = 6;
+        static constexpr uint32_t m_messageLen = 14;
         char m_buffer[m_messageLen + 1];
-        TurnType m_modeType;
 
     public:
-        ModeChangeCommandInfo(TurnType modeType);
+        ModeChangeCommandInfo(const InitializationCommand& initData);
+
+        const char* toBytes() override;
+        uint32_t bytesCount() const override;
+};
+
+struct PauseChangeCommandInfo: public BaseCommand
+{
+    // <a{1:paused}> --> 4 -> len
+    private:
+        static constexpr uint32_t m_messageLen = 4;
+        char m_buffer[m_messageLen + 1];
+        bool m_paused;
+
+    public:
+        PauseChangeCommandInfo(bool paused);
 
         const char* toBytes() override;
         uint32_t bytesCount() const override;

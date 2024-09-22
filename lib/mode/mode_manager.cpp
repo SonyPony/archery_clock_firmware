@@ -7,13 +7,14 @@ ModeManager::ModeManager() {
     m_currentMode = nullptr;
     this->roundChangeCallback = nullptr;
     this->modeChangeCallback = nullptr;
-    this->pauseChangeCallback = nullptr;
-    this->m_currentModeType = TurnType::None_TurnType;
+    this->pausedChangeCallback = nullptr;
+    this->m_currentModeData.turn_type = TurnType::None_TurnType;
 }
 
 void ModeManager::initMode(InitializationCommand initData) {
     this->m_currentMode = nullptr;
-    this->m_currentModeType = TurnType::None_TurnType;
+    this->m_currentModeData = initData;
+    this->m_currentModeData.turn_type = TurnType::None_TurnType;
 
     switch (initData.turn_type)
     {
@@ -39,20 +40,19 @@ void ModeManager::initMode(InitializationCommand initData) {
     } 
 
     if(this->m_currentMode != nullptr) {
-        this->m_currentModeType = initData.turn_type;
         this->m_currentMode->roundChangeCallback = this->roundChangeCallback;
-        this->m_currentMode->pausedChangeCallback = this->pauseChangeCallback;
+        this->m_currentMode->pausedChangeCallback = this->pausedChangeCallback;
         this->m_currentMode->resetState(initData);
     }
 
     if(this->modeChangeCallback != nullptr) {
-        this->modeChangeCallback(this->currentModeType());
+        this->modeChangeCallback(this->currentModeData());
     }
 }
 
-TurnType ModeManager::currentModeType() const
+InitializationCommand ModeManager::currentModeData() const
 {
-    return this->m_currentModeType;
+    return this->m_currentModeData;
 }
 
 bool ModeManager::modeDataValid() const

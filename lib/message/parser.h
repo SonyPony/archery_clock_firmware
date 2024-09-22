@@ -5,8 +5,6 @@
 #include <lib/core/buffer.h>
 #include <lib/data/commands.h>
 
-#define MESSAGE_START_SYMBOL '<'
-#define MESSAGE_END_SYMBOL '>'
 
 class MessageParser {
     private:

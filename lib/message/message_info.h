@@ -11,7 +11,7 @@ enum MessageType
     PauseMessageType = 5,
     NextStepMessageType = 6,
     BreakMessageType = 7,
-    PauseStateMessageType = 'a',
+    PauseChangeMessageType = 'a',
     RoundChangeMessageType = 'b',
     TimerChangeMessageType = 'c',
     CurrentModeChangeMessageType = 'd',
