@@ -86,7 +86,10 @@ bool AbcdModeData::display(DisplayState *displayState) const
         return true;
 
     // set time
-    sprintf(displayState->leftDisplay, "%3d", this->currentTime());
+    if(!this->running())
+        sprintf(displayState->leftDisplay, "   ");    
+    else
+        sprintf(displayState->leftDisplay, "%3d", this->currentTime());
     // set turn
     sprintf(displayState->rightDisplay, "%s",
             (this->m_currentTurn == AbTurn) ? "AB " : "CD ");

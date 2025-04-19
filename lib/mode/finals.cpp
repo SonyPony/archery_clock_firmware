@@ -122,8 +122,16 @@ bool FinalsModeData::display(DisplayState *displayState) const
 
     this->displaySemaphor(displayState);
     // set time
-    sprintf(displayState->leftDisplay, "%3d", this->m_leftCurrentTime);
-    sprintf(displayState->rightDisplay, "%3d", this->m_rightCurrentTime);
+    if(!this->running()) {
+        sprintf(displayState->leftDisplay, "   ");    
+        sprintf(displayState->rightDisplay, "   ");    
+    }
+
+    else {
+        sprintf(displayState->leftDisplay, "%3d", this->m_leftCurrentTime);
+        sprintf(displayState->rightDisplay, "%3d", this->m_rightCurrentTime);
+    }
+    
 
     // display turn
     sprintf(displayState->middleDisplay, "%s",
