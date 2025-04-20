@@ -125,7 +125,7 @@ int main()
 
     while (true)
     {
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 20; i++)    // 20 * 50 ->1s ticking
         {
             const BaseCommand *command = msgParser.parseMessage();
             if (command != nullptr)
