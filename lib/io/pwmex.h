@@ -11,12 +11,14 @@ class PWMPin {
         uint32_t m_channel;
         uint32_t m_clockFrequency;
         bool m_running;
+        bool m_inited;
 
     public:
+        PWMPin(uint32_t pin);
         PWMPin(uint32_t pin, uint32_t frequency, uint8_t DCL);
 
-        void start();
-        void stop();
+        bool start();
+        bool stop();
         void setParameters(uint32_t frequency, uint8_t DCL);
 
         bool running() const;
