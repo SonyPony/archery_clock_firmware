@@ -145,6 +145,9 @@ void BaseModeData::displayBreak(DisplayState *displayState) const
 
 void BaseModeData::pause()
 {
+    if(!this->running())
+        return;
+
     this->m_paused = true;
     this->m_running = false;    // pause is a special cause, where we don'T want to beep
 
@@ -154,6 +157,9 @@ void BaseModeData::pause()
 
 void BaseModeData::resume()
 {
+    if(!this->paused())
+        return;
+
     this->m_paused = false;
     this->m_running = true;     //dtto with resume, no beeping here
 
