@@ -95,10 +95,16 @@ int main()
         tcpServer.send(roundChangeInfo);
     };
 
-    modeManager.modeChangeCallback = [&tcpServer](InitializationCommand initData) -> void
+    modeManager.modeChangeCallback = [&tcpServer, &modeManager](InitializationCommand initData) -> void
     {
         ModeChangeCommandInfo modeChangeInfo(initData);
         tcpServer.send(modeChangeInfo);
+
+        RoundChangeCommandInfo roundChangeInfo(modeManager.currentMode()->roundInfo());
+        tcpServer.send(roundChangeInfo);
+        
+        PauseChangeCommandInfo pauseChangeInfo(modeManager.currentMode()->paused());
+        tcpServer.send(pauseChangeInfo);
     };
 
     modeManager.pausedChangeCallback = [&tcpServer](bool paused) -> void
