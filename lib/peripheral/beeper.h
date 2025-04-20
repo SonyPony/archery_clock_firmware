@@ -4,13 +4,13 @@
 #include <stdint.h>
 #include <lib/peripheral/gpioex.h>
 
-class Beeber
+class Beeper
 {
     private:
         GPIOPin m_beeperPin;
 
     public:
-        Beeber(uint32_t beeperPin);
+        Beeper(uint32_t beeperPin);
         
         void beep(uint8_t beepCount);
 
