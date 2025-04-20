@@ -1,6 +1,8 @@
 #include <string.h>
 
 #include "pico/stdlib.h"
+#include "hardware/timer.h"
+#include "hardware/clocks.h"
 
 #include "lwip/pbuf.h"
 #include "lib/network/dhcpserver.h"
@@ -15,6 +17,12 @@
 
 #include <lib/mode/mode_manager.h>
 #include <lib/peripheral/shift_register.h>
+#include <lib/peripheral/beeper.h>
+
+// defintition of beeps
+constexpr uint32_t BEEP_SIGNAL_FREQ = 7940;         // in Hz
+constexpr uint32_t BEEP_DURATION = 33;              // in ms
+constexpr uint32_t BEEP_PAUSE_DURATION = 100;       // in ms
 
 // definitions fow wifi
 constexpr const char *SSID_NAME = "picow_test";
@@ -30,6 +38,7 @@ Buffer messageBuffer(messageBufferData, &messageBufferDataEndIdx, MESSAGE_BUFFER
 constexpr uint32_t SR_CLK_PIN = 28;
 constexpr uint32_t SR_DATA_PIN = 27;
 constexpr uint32_t SR_CS_PIN = 26;
+constexpr uint32_t BEEPER_PIN = 2;
 
 static void recvHandler(TCPClientInfo *clientInfo, tcp_pcb_t *clientPcb, pbuf_t *buffer, err_t err)
 {
@@ -67,12 +76,12 @@ int main()
     TCPServer tcpServer(80);
     tcpServer.recvHandler = &recvHandler;
 
-    // setup clock managers
     int currentStep = 0;
     ModeManager modeManager;
     MessageParser msgParser(&messageBuffer);
     ShiftRegister shiftRegister(SR_CLK_PIN, SR_DATA_PIN, SR_CS_PIN);
     DisplayController displayController(&shiftRegister);
+    Beeper beeper(BEEPER_PIN, BEEP_SIGNAL_FREQ, BEEP_DURATION, BEEP_PAUSE_DURATION);
 
     tcpServer.newClientCallback = [&tcpServer, &modeManager](TCPClientInfo* newClient) -> void {
         ModeChangeCommandInfo modeChangeInfo(modeManager.currentModeData());
