@@ -76,6 +76,7 @@ int main()
     TCPServer tcpServer(80);
     tcpServer.recvHandler = &recvHandler;
 
+    // setup clock managers and peripherals
     int currentStep = 0;
     ModeManager modeManager;
     MessageParser msgParser(&messageBuffer);
@@ -120,6 +121,20 @@ int main()
     {
         PauseChangeCommandInfo pauseChangeInfo(paused);
         tcpServer.send(pauseChangeInfo);
+    };
+
+    // connect beeps
+    modeManager.prepStartCallback = [&beeper]() -> void {
+        beeper.beep(2);
+    };
+
+    modeManager.prepEndCallback = [&beeper]() -> void {
+        beeper.beep(1);
+    };
+
+    modeManager.runningChangeCallback = [&beeper](bool running) -> void {
+        if(!running)
+            beeper.beep(3);
     };
 
     // init display

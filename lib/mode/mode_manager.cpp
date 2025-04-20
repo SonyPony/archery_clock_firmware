@@ -9,6 +9,9 @@ ModeManager::ModeManager() {
     this->roundChangeCallback = nullptr;
     this->modeChangeCallback = nullptr;
     this->pausedChangeCallback = nullptr;
+    this->prepStartCallback = nullptr;
+    this->prepEndCallback = nullptr;
+    this->runningChangeCallback = nullptr;
     this->m_currentModeData.turn_type = TurnType::None_TurnType;
 }
 
@@ -43,6 +46,9 @@ void ModeManager::initMode(InitializationCommand initData) {
     if(this->m_currentMode != nullptr) {
         this->m_currentMode->roundChangeCallback = this->roundChangeCallback;
         this->m_currentMode->pausedChangeCallback = this->pausedChangeCallback;
+        this->m_currentMode->prepStartCallback = this->prepStartCallback;
+        this->m_currentMode->prepEndCallback = this->prepEndCallback;
+        this->m_currentMode->runningChangeCallback = this->runningChangeCallback;
         this->m_currentMode->resetState(initData);
     }
 

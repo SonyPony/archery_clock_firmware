@@ -45,6 +45,9 @@ class ModeManager
         std::function<void(InitializationCommand)> modeChangeCallback;
         std::function<void(RoundInfo)> roundChangeCallback; 
         std::function<void(bool)> pausedChangeCallback; 
+        std::function<void()> prepStartCallback;
+        std::function<void()> prepEndCallback;
+        std::function<void(bool)> runningChangeCallback;
 };
 
 #endif

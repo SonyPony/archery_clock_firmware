@@ -2,7 +2,12 @@
 #include "pico/stdlib.h"
 #include <lib/logging/logging.h>
 
-Beeper::Beeper(uint32_t beeperPin): m_beeperPWM(beeperPin), m_currentBeepCounter(0)
+Beeper::Beeper(uint32_t beeperPin, uint32_t sinalFrequency, uint32_t beepDuration, uint32_t beepsPauseDuration)
+: m_beeperPWM(beeperPin), 
+m_currentBeepCounter(0),
+m_signalFrequency(m_signalFrequency),
+m_beepDuration(beepDuration),
+m_betweenBeepsPauseDuration(beepsPauseDuration)
 {}
 
 void Beeper::beep(uint8_t beepCount) {
@@ -15,7 +20,7 @@ void Beeper::singleBeep() {
     if(this->m_currentBeepCounter <= 0) 
         return;
 
-    Logging::log(LoggingLevel::Debug, "Start beep\n");
+    Logging::log(LoggingLevel::Info, "Start beep\n");
 
     this->m_beeperPWM.setParameters(this->m_signalFrequency, 50);
     this->m_beeperPWM.start();
@@ -33,7 +38,7 @@ void Beeper::singleBeep() {
 int64_t Beeper::handleSingleBeepEnd(alarm_id_t alaramId, void* data) {
     Beeper* self = static_cast<Beeper*>(data);
     self->m_beeperPWM.stop();
-    Logging::log(LoggingLevel::Debug, "End beep.\n");
+    Logging::log(LoggingLevel::Info, "End beep.\n");
 
     if(self->m_currentBeepCounter <= 0)   // no more beeps, end it
         return false;

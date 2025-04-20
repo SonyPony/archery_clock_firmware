@@ -10,9 +10,12 @@ BaseModeData::BaseModeData() {
     this->m_currentTimer = nullptr;
     this->roundChangeCallback = nullptr;
     this->pausedChangeCallback = nullptr;
+    this->prepStartCallback = nullptr;
+    this->prepEndCallback = nullptr;
+    this->runningChangeCallback = nullptr;
 }
 
-void BaseModeData::resetState(InitializationCommand initData) {
+void BaseModeData::resetState(InitializationCommand initData) { // hard reset without notifications, used for init
     this->m_running = false;
     this->m_paused = false;
     this->m_initData = initData;
@@ -26,6 +29,9 @@ void BaseModeData::resetState(InitializationCommand initData) {
 void BaseModeData::restorePrepTimer() {
     this->m_prepTimer = this->m_initData.prep_time;
     this->m_currentTimer = &this->m_prepTimer;
+
+    if(this->prepEndCallback && this->isPrepTime() && this->running())
+        this->prepStartCallback();
 }
 
 bool BaseModeData::running() const {
@@ -42,11 +48,18 @@ void BaseModeData::decrementCurrentTime()
 }
 
 void BaseModeData::setRunning(bool running) {
+    const bool previousRunningState = this->running();
+
     this->m_running = running;
     if(this->m_running)
         this->restorePrepTimer();
     else
         this->setNextRound();
+
+    if(previousRunningState != this->running()) {
+        if(this->runningChangeCallback )
+            this->runningChangeCallback(this->running());
+    }
 }
 
 bool BaseModeData::isPrepTime() const
@@ -133,7 +146,7 @@ void BaseModeData::displayBreak(DisplayState *displayState) const
 void BaseModeData::pause()
 {
     this->m_paused = true;
-    this->m_running = false;
+    this->m_running = false;    // pause is a special cause, where we don'T want to beep
 
     if(this->pausedChangeCallback != nullptr)
         this->pausedChangeCallback(this->paused());
@@ -142,7 +155,7 @@ void BaseModeData::pause()
 void BaseModeData::resume()
 {
     this->m_paused = false;
-    this->m_running = true;
+    this->m_running = true;     //dtto with resume, no beeping here
 
     if(this->pausedChangeCallback != nullptr)
         this->pausedChangeCallback(this->paused());
@@ -190,8 +203,14 @@ bool BaseModeData::handleSecTick() {
     if(!this->running())
         return true;
 
+    const bool prepTimeBeforeDecrement = this->isPrepTime();
+
     // handle prep time
     this->decrementCurrentTime();
+
+    // handle prep time end
+    if(prepTimeBeforeDecrement && !this->isPrepTime() && this->prepEndCallback)
+        this->prepEndCallback();
 
     if(this->isPrepTime())
         return true;

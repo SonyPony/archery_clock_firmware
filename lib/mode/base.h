@@ -27,6 +27,9 @@ class BaseModeData
         void displayBreak(DisplayState* displayState) const;
 
     public:
+        std::function<void()> prepStartCallback;
+        std::function<void()> prepEndCallback;
+        std::function<void(bool)> runningChangeCallback;
         std::function<void(RoundInfo)> roundChangeCallback; 
         std::function<void(bool)> pausedChangeCallback; 
         BaseModeData();
