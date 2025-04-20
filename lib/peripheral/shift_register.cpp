@@ -1,6 +1,6 @@
 #include "shift_register.h"
 #include <stdlib.h>
-#include <lib/peripheral/gpioex.h>
+#include <lib/io/gpioex.h>
 #include <pico/stdlib.h>
 
 ShiftRegister::ShiftRegister(uint32_t clkPin, uint32_t dataPin, uint32_t csPin) : m_clkPin(clkPin, GPIOMode::GPIOOut, false),

@@ -1,1 +1,1 @@
-target_sources(archery_clock_firmware PRIVATE uart.h uart.cpp)
+target_sources(archery_clock_firmware PRIVATE uart.h uart.cpp gpioex.cpp gpioex.h)

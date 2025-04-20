@@ -2,7 +2,7 @@
 #define _SHIFT_REGISTER_H_
 
 #include <stdint.h>
-#include <lib/peripheral/gpioex.h>
+#include <lib/io/gpioex.h>
 
 class ShiftRegister
 {
