@@ -72,6 +72,7 @@ target_include_directories(archery_clock_firmware PRIVATE
 target_link_libraries(archery_clock_firmware 
         hardware_timer
         hardware_clocks
+        hardware_pwm
         pico_cyw43_arch_lwip_threadsafe_background
         )
 
