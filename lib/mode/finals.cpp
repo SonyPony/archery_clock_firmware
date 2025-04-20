@@ -122,7 +122,7 @@ bool FinalsModeData::display(DisplayState *displayState) const
 
     this->displaySemaphor(displayState);
     // set time
-    if(!this->running()) {
+    if(!this->running() && !this->paused()) {
         sprintf(displayState->leftDisplay, "   ");    
         sprintf(displayState->rightDisplay, "   ");    
     }

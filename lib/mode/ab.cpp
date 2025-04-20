@@ -60,7 +60,7 @@ bool AbModeData::display(DisplayState *displayState) const
         return true;
 
     // set time
-    if(!this->running())
+    if(!this->running() && !this->paused())
         sprintf(displayState->leftDisplay, "   ");    
     else
         sprintf(displayState->leftDisplay, "%3d", this->currentTime());
